@@ -26,14 +26,13 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        {/* Google AdSense Verification */}
+        {/* ✅ 정확한 AdSense 코드 (client 값 주의) */}
         <script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5086993825080143"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5086983825808143"
           crossOrigin="anonymous"
         ></script>
       </head>
-
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>

@@ -1,65 +1,119 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  const [text, setText] = useState("");
+
+  const handleNext = () => {
+    if (!text.trim()) {
+      alert("분쟁 내용을 입력해주세요.");
+      return;
+    }
+
+    // 로딩/광고 페이지로 텍스트 전달
+    localStorage.setItem("dispute_text", text);
+    router.push("/loading");
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f7f7f7",
+        padding: "40px 20px",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* 가운데 정렬된 컨테이너 */}
+      <div
+        style={{
+          maxWidth: 800,
+          margin: "0 auto",
+          background: "#fff",
+          padding: "32px",
+          borderRadius: 16,
+          boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
+        }}
+      >
+        {/* 헤더 */}
+        <h1
+          style={{
+            fontSize: 28,
+            fontWeight: 700,
+            marginBottom: 8,
+          }}
+        >
+          AI 솔로몬
+        </h1>
+        <p style={{ color: "#666", marginBottom: 24, fontSize: 14 }}>
+          분쟁 상황을 입력하면 AI가 사건을 분석하고 대응 보고서를 생성해드립니다.
+        </p>
+
+        {/* 라벨 */}
+        <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 15 }}>
+          📝 분쟁 내용을 입력해주세요
+        </div>
+
+        {/* 대형 입력 박스 */}
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={`예시)\n- 남자친구 , 여자친구의 의견이 충돌하여 갈등을 빚고있는 상황\n- 상대방과 의견 충돌이 지속되어 조정이나 대응 문서가 필요한 상황\n- 금전·물품·계약 관련 문제로 서로의 입장이 크게 엇갈리는 상황\n- 의사소통이 원활하지 않아 오해가 쌓이고 갈등이 심화된 상황`}
+          style={{
+            width: "100%",
+            height: 320,
+            padding: 16,
+            borderRadius: 12,
+            border: "1px solid #ccc",
+            resize: "none",
+            fontSize: 14,
+            lineHeight: 1.6,
+            boxSizing: "border-box",
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+
+        {/* 작성 팁 */}
+        <div
+          style={{
+            background: "#fafafa",
+            padding: 16,
+            borderRadius: 12,
+            marginTop: 20,
+            lineHeight: 1.6,
+            fontSize: 13,
+            color: "#555",
+          }}
+        >
+          <strong style={{ fontWeight: 600 }}>✦ 작성 가이드</strong>
+          <ul style={{ marginTop: 8, paddingLeft: 20 }}>
+            <li>언제, 어디서, 누구와 발생한 일인지 설명해주세요.</li>
+            <li>A의 의견 B의 의견을 분리해서 설명하면 더 정확한 분석 결과를 얻을수 있습니다.</li>
+            <li>복잡한 사건일수록 더 정확한 분석이 가능합니다.</li>
+          </ul>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+        {/* 버튼 */}
+        <button
+          onClick={handleNext}
+          style={{
+            marginTop: 28,
+            width: "100%",
+            padding: "14px 0",
+            borderRadius: 12,
+            fontSize: 16,
+            fontWeight: 600,
+            border: "none",
+            background: "#000",
+            color: "#fff",
+            cursor: "pointer",
+          }}
+        >
+          AI에게 분석 요청하기 →
+        </button>
+      </div>
     </div>
   );
 }

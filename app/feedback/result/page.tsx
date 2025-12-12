@@ -20,6 +20,18 @@ export default function FeedbackResultPage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FeedbackSolution | null>(null);
 
+  /* ===========================
+     ✅ 카카오 SDK 초기화 (추가)
+  =========================== */
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).Kakao) {
+      const Kakao = (window as any).Kakao;
+      if (!Kakao.isInitialized()) {
+        Kakao.init("카카오_자바스크립트_키"); // ← 네 키
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const text = localStorage.getItem("dispute_text");
 
@@ -52,6 +64,36 @@ export default function FeedbackResultPage() {
       }
     })();
   }, []);
+
+  /* ===========================
+     ✅ 카카오톡 공유 함수 (추가)
+  =========================== */
+  const shareKakao = () => {
+    const Kakao = (window as any).Kakao;
+    if (!Kakao || !data) return;
+
+    Kakao.Share.sendDefault({
+      objectType: "feed",
+      content: {
+        title: "AI 솔로몬 합의 솔루션 보고서",
+        description: data.solution.main_direction,
+        imageUrl: "https://ai-solomon.vercel.app/og-image.png",
+        link: {
+          webUrl: "https://ai-solomon.vercel.app",
+          mobileWebUrl: "https://ai-solomon.vercel.app",
+        },
+      },
+      buttons: [
+        {
+          title: "보고서 확인하기",
+          link: {
+            webUrl: "https://ai-solomon.vercel.app",
+            mobileWebUrl: "https://ai-solomon.vercel.app",
+          },
+        },
+      ],
+    });
+  };
 
   if (loading) {
     return (
@@ -142,52 +184,24 @@ export default function FeedbackResultPage() {
             marginTop: 24,
           }}
         >
-          <div
-            style={{
-              background: "#fafafa",
-              padding: 16,
-              borderRadius: 12,
-              border: "1px solid #eee",
-            }}
-          >
-            <h3 style={{ fontSize: 16, fontWeight: 700 }}>A 입장 요약</h3>
-            <p style={{ marginTop: 8, fontSize: 14, color: "#555", whiteSpace: "pre-wrap" }}>
-              {a_summary}
-            </p>
+          <div style={box}>
+            <h3 style={h3}>A 입장 요약</h3>
+            <p style={p}>{a_summary}</p>
           </div>
 
-          <div
-            style={{
-              background: "#fafafa",
-              padding: 16,
-              borderRadius: 12,
-              border: "1px solid #eee",
-            }}
-          >
-            <h3 style={{ fontSize: 16, fontWeight: 700 }}>B 입장 요약</h3>
-            <p style={{ marginTop: 8, fontSize: 14, color: "#555", whiteSpace: "pre-wrap" }}>
-              {b_summary}
-            </p>
+          <div style={box}>
+            <h3 style={h3}>B 입장 요약</h3>
+            <p style={p}>{b_summary}</p>
           </div>
         </div>
 
-        {/* 전체 상황 정리 */}
-        <div
-          style={{
-            marginTop: 24,
-            background: "#fafafa",
-            padding: 16,
-            borderRadius: 12,
-            border: "1px solid #eee",
-          }}
-        >
-          <h3 style={{ fontSize: 16, fontWeight: 700 }}>전체 상황 정리</h3>
-          <p style={{ marginTop: 8, fontSize: 14, color: "#555", whiteSpace: "pre-wrap" }}>
-            {joint_summary}
-          </p>
+        {/* 전체 상황 */}
+        <div style={{ ...box, marginTop: 24 }}>
+          <h3 style={h3}>전체 상황 정리</h3>
+          <p style={p}>{joint_summary}</p>
         </div>
 
-        {/* 솔루션 메인 방향 */}
+        {/* 합의 방향 */}
         <div
           style={{
             marginTop: 24,
@@ -197,33 +211,23 @@ export default function FeedbackResultPage() {
             border: "1px solid #d6e0ff",
           }}
         >
-          <h3 style={{ fontSize: 16, fontWeight: 700 }}>합의의 큰 방향</h3>
-          <p style={{ marginTop: 8, fontSize: 14, color: "#333", whiteSpace: "pre-wrap" }}>
-            {solution.main_direction}
-          </p>
+          <h3 style={h3}>합의의 큰 방향</h3>
+          <p style={{ ...p, color: "#333" }}>{solution.main_direction}</p>
         </div>
 
-        {/* 단계별 실행 방법 */}
-        <div
-          style={{
-            marginTop: 24,
-            background: "#fafafa",
-            padding: 16,
-            borderRadius: 12,
-            border: "1px solid #eee",
-          }}
-        >
-          <h3 style={{ fontSize: 16, fontWeight: 700 }}>단계별 실행 방법</h3>
-          <ol style={{ marginTop: 8, paddingLeft: 20, fontSize: 14, color: "#555" }}>
-            {solution.suggested_steps?.map((step, idx) => (
-              <li key={idx} style={{ marginBottom: 4 }}>
-                {step}
+        {/* 단계 */}
+        <div style={{ ...box, marginTop: 24 }}>
+          <h3 style={h3}>단계별 실행 방법</h3>
+          <ol style={{ marginTop: 8, paddingLeft: 20 }}>
+            {solution.suggested_steps.map((s, i) => (
+              <li key={i} style={{ marginBottom: 4 }}>
+                {s}
               </li>
             ))}
           </ol>
         </div>
 
-        {/* 대화에 써먹을 수 있는 문장들 */}
+        {/* 대화 문장 */}
         <div
           style={{
             marginTop: 24,
@@ -232,59 +236,71 @@ export default function FeedbackResultPage() {
             gap: 16,
           }}
         >
-          <div
-            style={{
-              background: "#fff7f0",
-              padding: 16,
-              borderRadius: 12,
-              border: "1px solid #ffe0c2",
-            }}
-          >
-            <h3 style={{ fontSize: 15, fontWeight: 700 }}>A가 써볼 수 있는 말들</h3>
-            <ul style={{ marginTop: 8, paddingLeft: 20, fontSize: 13, color: "#555" }}>
-              {solution.phrases_for_a?.map((s, idx) => (
-                <li key={idx} style={{ marginBottom: 4 }}>
-                  {s}
-                </li>
+          <div style={{ ...box, background: "#fff7f0", border: "1px solid #ffe0c2" }}>
+            <h3 style={h3}>A가 써볼 수 있는 말</h3>
+            <ul>
+              {solution.phrases_for_a.map((s, i) => (
+                <li key={i}>{s}</li>
               ))}
             </ul>
           </div>
 
-          <div
-            style={{
-              background: "#f0fff4",
-              padding: 16,
-              borderRadius: 12,
-              border: "1px solid #c2ffd7",
-            }}
-          >
-            <h3 style={{ fontSize: 15, fontWeight: 700 }}>B가 써볼 수 있는 말들</h3>
-            <ul style={{ marginTop: 8, paddingLeft: 20, fontSize: 13, color: "#555" }}>
-              {solution.phrases_for_b?.map((s, idx) => (
-                <li key={idx} style={{ marginBottom: 4 }}>
-                  {s}
-                </li>
+          <div style={{ ...box, background: "#f0fff4", border: "1px solid #c2ffd7" }}>
+            <h3 style={h3}>B가 써볼 수 있는 말</h3>
+            <ul>
+              {solution.phrases_for_b.map((s, i) => (
+                <li key={i}>{s}</li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* 주의사항 */}
-        <div
-          style={{
-            marginTop: 24,
-            background: "#fff5f5",
-            padding: 16,
-            borderRadius: 12,
-            border: "1px solid #ffd6d6",
-          }}
-        >
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: "#c0392b" }}>주의해야 할 점</h3>
-          <p style={{ marginTop: 8, fontSize: 13, color: "#555", whiteSpace: "pre-wrap" }}>
-            {caution}
-          </p>
+        {/* 주의 */}
+        <div style={{ ...box, marginTop: 24, background: "#fff5f5", border: "1px solid #ffd6d6" }}>
+          <h3 style={{ ...h3, color: "#c0392b" }}>주의해야 할 점</h3>
+          <p style={p}>{caution}</p>
+        </div>
+
+        {/* ✅ 카카오톡 공유 버튼 (여기만 추가됨) */}
+        <div style={{ textAlign: "center", marginTop: 48 }}>
+          <button
+            onClick={shareKakao}
+            style={{
+              background: "#FEE500",
+              color: "#000",
+              padding: "16px 32px",
+              borderRadius: 14,
+              border: "none",
+              fontSize: 16,
+              fontWeight: 700,
+              cursor: "pointer",
+              boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+            }}
+          >
+            📤 카카오톡으로 공유하기
+          </button>
         </div>
       </div>
     </div>
   );
 }
+
+/* ===== 공통 스타일 ===== */
+const box = {
+  background: "#fafafa",
+  padding: 16,
+  borderRadius: 12,
+  border: "1px solid #eee",
+};
+
+const h3 = {
+  fontSize: 16,
+  fontWeight: 700,
+};
+
+const p = {
+  marginTop: 8,
+  fontSize: 14,
+  color: "#555",
+  whiteSpace: "pre-wrap" as const,
+};

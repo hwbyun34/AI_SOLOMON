@@ -19,126 +19,120 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🔹 프롬프트: 무조건 JSON 하나만 출력하게 강하게 지시
+    /**
+     * ✅ 의도 분리형 AI 패널 10명
+     * - 객관 5
+     * - 감정 1
+     * - 도덕 1
+     * - 일반 인식 1
+     * - 구조/재발 1
+     * - 균형 중립 1
+     */
+    const panelStyles = [
+      "사실관계 정합성 분석 패널",
+      "증거 신뢰도 및 근거 충족성 평가 패널",
+      "논리 구조 일관성 검증 패널",
+      "행위 인과관계 분석 패널",
+      "제3자 관점 사실 판단 패널",
+
+      "감정 반응 및 심리 영향 분석 패널",
+      "사회적 책임 및 도덕 규범 관점 패널",
+      "일반인 인식 및 상식 기준 판단 패널",
+      "분쟁 구조 지속성 및 재발 가능성 분석 패널",
+      "객관·중립 종합 판단 패널",
+    ];
+
     const messages = [
       {
         role: "system",
         content: `
-당신은 JSON만 출력하는 AI입니다.
-설명 문장, 코드 블록, 주석, 텍스트 등은 절대 출력하지 말고
-반드시 하나의 JSON 객체만 출력해야 합니다.
+당신은 분쟁 분석 전문가 AI입니다.
 
-JSON 구조는 다음과 같습니다.
+반드시 다음 절차를 따르십시오:
 
-{
-  "summary": "(사용자가 적은 사건을 3~5줄로 요약한 한국어 문장)",
-  "panels": [
-    {
-      "panel": "AI Panel #1",
-      "style": "사고 방식 설명(예: 사실 기반 논리 분석 전문가)",
-      "side": "입장 1 우세" 또는 "입장 2 우세" 또는 "중립" 중 하나,
-      "reason": "해당 판단을 한 간단한 이유(1~2문장)"
-    },
-    ...
-    (총 10개 패널)
-  ]
-}
-        `.trim(),
+1. 사건을 바탕으로 "입장 1"과 "입장 2"를 내부적으로 구조화합니다.
+2. 아래에 주어진 패널 성향을 반드시 그대로 사용합니다.
+3. 각 패널은 자신의 성향에만 충실하게 판단합니다.
+
+각 패널은 다음 2가지만 작성합니다:
+- 판단 방향: "입장 1 우세" / "입장 2 우세" / "중립"
+- 판단 사유: 1~2문장, 간결하고 명확하게
+
+⚠️ 중요 규칙
+- 사건 내용을 길게 반복하지 마십시오.
+- 감정 패널은 감정 관점만, 도덕 패널은 도덕 관점만 사용하십시오.
+- 출력은 반드시 JSON만 허용됩니다.
+- 코드블록, 설명 문장, 여분 텍스트 절대 금지.
+        `,
       },
       {
         role: "user",
         content: `
-다음은 사용자가 작성한 분쟁 내용입니다.
+다음 분쟁을 분석하세요:
 
 "${text}"
 
-1. 위 사건을 3~5줄로 자연스럽게 요약해서 "summary" 필드에 넣으세요.
-2. 서로 다른 사고 방식을 가진 AI 패널 10명을 가정하고,
-   각 패널에 대해 "panel", "style", "side", "reason"을 채워서 "panels" 배열을 만드세요.
-3. "side" 값은 반드시 아래 셋 중 하나만 사용해야 합니다.
-   - "입장 1 우세"
-   - "입장 2 우세"
-   - "중립"
+아래 패널 성향을 순서대로 사용하여 총 10명의 판단을 생성하세요:
 
-위에서 제시한 JSON 형식 하나만 출력하세요.
-        `.trim(),
+${panelStyles.map((s, i) => `${i + 1}. ${s}`).join("\n")}
+
+출력 형식 (반드시 동일):
+
+{
+  "summary": "사건의 핵심을 3~4줄로 요약",
+  "panels": [
+    {
+      "panel": "AI Panel #1",
+      "style": "패널 성향",
+      "side": "입장 1 우세 / 입장 2 우세 / 중립",
+      "reason": "판단 사유"
+    }
+  ]
+}
+        `,
       },
     ];
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages,
-        temperature: 0.6,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
-      return NextResponse.json(
-        { error: "OpenAI API 호출 실패" },
-        { status: 500 }
-      );
-    }
+    const response = await fetch(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages,
+          temperature: 0.4, // 🔥 자유분방함 억제
+        }),
+      }
+    );
 
     const result = await response.json();
-    let raw: string = result.choices?.[0]?.message?.content ?? "";
+    const raw = result.choices?.[0]?.message?.content;
 
-    // 🔍 디버그용 (로컬 개발 시 콘솔에서 응답 형태 확인)
-    console.log("RAW RESPONSE:", raw);
-
-    if (!raw || typeof raw !== "string") {
+    if (!raw) {
       return NextResponse.json(
-        { error: "OpenAI 응답이 비어 있습니다." },
+        { error: "AI 응답이 비어 있습니다." },
         { status: 500 }
       );
     }
 
-    // ```json ... ``` 같은 코드블록 제거 + 앞뒤 잡스러운 텍스트 제거
-    raw = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
-
-    // 내용 중에서 첫 '{'부터 마지막 '}'까지를 잘라서 JSON으로 시도
-    const start = raw.indexOf("{");
-    const end = raw.lastIndexOf("}");
-    if (start === -1 || end === -1) {
-      console.error("No JSON braces found in:", raw);
-      return NextResponse.json(
-        { error: "JSON 형식을 찾을 수 없습니다." },
-        { status: 500 }
-      );
-    }
-
-    const jsonString = raw.slice(start, end + 1);
-
-    let data: any;
+    let json;
     try {
-      data = JSON.parse(jsonString);
-    } catch (e) {
-      console.error("JSON parse error:", e, "\nJSON STRING:", jsonString);
-      return NextResponse.json(
-        { error: "JSON 파싱에 실패했습니다." },
-        { status: 500 }
-      );
+      json = JSON.parse(raw);
+    } catch {
+      const cleaned = raw.replace(/```json|```/g, "").trim();
+      json = JSON.parse(cleaned);
     }
 
-    // 최소 구조 검증
-    if (!data.summary || !Array.isArray(data.panels)) {
-      console.error("Invalid JSON structure:", data);
-      return NextResponse.json(
-        { error: "JSON 구조가 올바르지 않습니다." },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(data);
+    return NextResponse.json(json);
   } catch (error) {
-    console.error("API error:", error);
-    return NextResponse.json({ error: "서버 오류" }, { status: 500 });
+    console.error("API ERROR:", error);
+    return NextResponse.json(
+      { error: "서버 오류가 발생했습니다." },
+      { status: 500 }
+    );
   }
 }

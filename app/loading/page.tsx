@@ -8,30 +8,49 @@ export default function LoadingPage() {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
+    // ① 전면 광고 호출 (승인 후 실제 코드 삽입)
+    const loadAd = () => {
+      try {
+        // 전면광고 선언 자리
+        // (adsbygoogle = window.adsbygoogle || []).push({
+        //   google_ad_client: "ca-pub-xxxx",
+        //   enable_page_level_ads: true,
+        //   overlays: {bottom: true}
+        // });
+      } catch (e) {
+        console.log("Ad load error", e);
+      }
+    };
+
+    loadAd();
+
+    // ② 단계별 메시지 (최대 15초 가정)
     const messages = [
-      "AI 솔로몬이 사건을 읽고 핵심 요소를 파악하는 중입니다...",
-      "관련 유사 사례와 논리를 탐색하는 중입니다...",
-      "AI 패널들이 각각 의견을 정리하고 있습니다...",
-      "곧 분석 보고서를 생성합니다..."
+      "AI 솔로몬이 사건 내용을 분석하고 있습니다...",
+      "핵심 쟁점을 추출하는 중입니다...",
+      "유사 사례 및 논리를 검토하는 중...",
+      "AI 패널 의견을 종합하고 있습니다...",
+      "최종 분석 보고서를 정리하고 있습니다..."
     ];
 
     messages.forEach((_, index) => {
-      setTimeout(() => setPhase(index), index * 900);
+      setTimeout(() => setPhase(index), index * 3500); // 약 3.5초 × 5단계 ≈ 17~18초
     });
 
+    // ③ 총 20초 후 결과 페이지 이동
     const timer = setTimeout(() => {
       router.push("/report");
-    }, 3600);
+    }, 20000);
 
     return () => clearTimeout(timer);
   }, [router]);
 
-  // 변화하는 문장 리스트
   const messages = [
-    "AI 솔로몬이 사건을 읽고 핵심 요소를 파악하는 중입니다...",
-    "관련 유사 사례와 논리를 탐색하는 중입니다...",
-    "AI 패널들이 각각 의견을 정리하고 있습니다...",
-    "곧 분석 보고서를 생성합니다..."
+    "AI 솔로몬이 사건 내용을 분석하고 있습니다...",
+    "핵심 쟁점을 추출하는 중입니다...",
+    "유사 사례 및 논리를 검토하는 중...",
+    "AI 패널 의견을 종합하고 있습니다...",
+    "최종 분석 보고서를 정리하고 있습니다..."
   ];
 
   return (
@@ -58,18 +77,10 @@ export default function LoadingPage() {
           position: "relative",
         }}
       >
-        {/* 제목 */}
-        <h2
-          style={{
-            fontSize: 22,
-            fontWeight: 700,
-            marginBottom: 16,
-          }}
-        >
+        <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>
           AI 솔로몬이 분석 중입니다...
         </h2>
 
-        {/* 동적 문구 */}
         <p
           style={{
             height: 40,
@@ -82,7 +93,6 @@ export default function LoadingPage() {
           {messages[phase]}
         </p>
 
-        {/* 로딩 아이콘 */}
         <div style={{ marginBottom: 24 }}>
           <div
             style={{
@@ -111,15 +121,12 @@ export default function LoadingPage() {
             lineHeight: 1.6,
           }}
         >
-          🔸 <strong>광고 영역(Ad)</strong>
+          🔸 <strong>전면 광고(Interstitial Ad)</strong>
           <br />
-          여기에 Google AdSense, 배너 광고 또는 파트너 광고를 넣을 수 있습니다.
-          <br />
-          분석 대기 시간 동안 자연스럽게 노출되어 수익 창출이 가능합니다.
+          광고가 먼저 표시되고, 광고 종료 후 AI 분석 마무리가 진행됩니다.
         </div>
       </div>
 
-      {/* animation keyframes */}
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }

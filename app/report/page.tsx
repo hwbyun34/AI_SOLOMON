@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Panel = {
   panel: string;
@@ -10,19 +11,25 @@ type Panel = {
 };
 
 export default function ReportPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState("");
   const [panels, setPanels] = useState<Panel[]>([]);
 
   useEffect(() => {
     const text = localStorage.getItem("dispute_text");
-
     if (!text) {
       alert("분쟁 내용이 없습니다.");
       return;
     }
 
-    // 🔥 서버 API 호출 → AI 패널 10명 판단 요청
+    const MIN_LOADING_TIME = 20000; // 20초 유지
+    const start = Date.now();
+
+    let aiFinished = false;
+    let aiResult: any = null;
+
+    // 🔥 AI 요청
     fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -30,20 +37,38 @@ export default function ReportPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        // AI가 생성한 요약 사용
-        setSummary(data.summary || text);
+        aiFinished = true;
+        aiResult = data;
 
-        // 패널 목록 적용
-        setPanels(data.panels || []);
+        const elapsed = Date.now() - start;
 
-        setLoading(false);
+        // 20초 통과 이후면 바로 표시
+        if (elapsed >= MIN_LOADING_TIME) {
+          applyResult(aiResult);
+        }
       })
       .catch((err) => {
         console.error(err);
         alert("AI 분석 요청 실패");
       });
+
+    // 🔥 20초 타이머
+    const timer = setTimeout(() => {
+      if (aiFinished && aiResult) {
+        applyResult(aiResult);
+      }
+    }, MIN_LOADING_TIME);
+
+    return () => clearTimeout(timer);
   }, []);
 
+  function applyResult(data: any) {
+    setSummary(data.summary);
+    setPanels(data.panels);
+    setLoading(false);
+  }
+
+  // 🔥 로딩 화면 (20초 유지)
   if (loading) {
     return (
       <div
@@ -61,11 +86,10 @@ export default function ReportPage() {
     );
   }
 
-  // 🔢 통계 계산
+  // 통계 계산
   const countPos1 = panels.filter((p) => p.side === "입장 1 우세").length;
   const countPos2 = panels.filter((p) => p.side === "입장 2 우세").length;
   const countNeutral = panels.filter((p) => p.side === "중립").length;
-
   const percent = (v: number) => Math.round((v / 10) * 100);
 
   return (
@@ -91,7 +115,7 @@ export default function ReportPage() {
           📄 AI 솔로몬 분쟁 분석 보고서
         </h1>
 
-        {/* 1. 사건 요약 */}
+        {/* 사건 요약 */}
         <h2 style={{ fontSize: 20, fontWeight: 600 }}>1. 사건 요약</h2>
         <div
           style={{
@@ -106,7 +130,7 @@ export default function ReportPage() {
           {summary}
         </div>
 
-        {/* 2. 패널 분석 결과 */}
+        {/* 패널 분석 */}
         <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32 }}>
           2. AI 패널별 분석 결과
         </h2>
@@ -121,7 +145,7 @@ export default function ReportPage() {
         >
           <thead>
             <tr style={{ background: "#eee" }}>
-              <th style={th}>패널</th>
+              <th style={th}>패널 성향</th>
               <th style={th}>판단 방향</th>
               <th style={th}>사유</th>
             </tr>
@@ -129,7 +153,7 @@ export default function ReportPage() {
           <tbody>
             {panels.map((p, index) => (
               <tr key={index}>
-                <td style={td}>{p.panel}</td>
+                <td style={td}>{p.style}</td>
                 <td
                   style={{
                     ...td,
@@ -150,7 +174,7 @@ export default function ReportPage() {
           </tbody>
         </table>
 
-        {/* 3. 종합 비율 */}
+        {/* 종합 판단 비율 */}
         <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32 }}>
           3. 종합 판단 비율
         </h2>
@@ -175,12 +199,38 @@ export default function ReportPage() {
             color="#d9534f"
           />
         </div>
+
+        {/* 🔥 강조 버튼 */}
+        <div style={{ textAlign: "center", marginTop: 50 }}>
+          <button
+            onClick={() => router.push("/feedback")}
+            style={{
+              background: "linear-gradient(135deg, #4A6EF5, #6A8BFF)",
+              color: "#fff",
+              padding: "26px 50px",
+              borderRadius: 18,
+              border: "none",
+              fontSize: 24,
+              cursor: "pointer",
+              fontWeight: 800,
+              boxShadow: "0 10px 30px rgba(74,110,245,0.55)",
+              transition: "0.25s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.085)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          >
+            💡 피드백 솔루션 제공받기
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-// 스타일 공통
 const th = {
   padding: 10,
   border: "1px solid #ddd",
@@ -191,7 +241,6 @@ const td = {
   border: "1px solid #ddd",
 };
 
-// 통계 카드 컴포넌트
 function StatCard({ label, value, count, color }: any) {
   return (
     <div

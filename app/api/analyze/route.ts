@@ -19,60 +19,52 @@ export async function POST(req: Request) {
       );
     }
 
-    // AI 패널 10명 구성
-    const panelStyles = [
-      "사실 기반 논리 분석 전문가",
-      "정서·감정 공감형 판단 전문가",
-      "법적 절차 및 계약 중심 분석가",
-      "분쟁 조정 전문가",
-      "객관적 데이터 우선 판단 전문가",
-      "사회적 상식 기반 분석가",
-      "타협점 도출 중심 중재자",
-      "증거와 기록 중심 검토 전문가",
-      "위험 최소화 관점 전문가",
-      "중립적 조정 + 논리 혼합형 분석가",
-    ];
-
+    // 🔹 프롬프트: 무조건 JSON 하나만 출력하게 강하게 지시
     const messages = [
       {
         role: "system",
         content: `
-당신은 분쟁 해결 전문가입니다.
-사용자가 입력한 사건을 기반으로 "입장 1"과 "입장 2"를 먼저 구조화하여 분리하세요.
+당신은 JSON만 출력하는 AI입니다.
+설명 문장, 코드 블록, 주석, 텍스트 등은 절대 출력하지 말고
+반드시 하나의 JSON 객체만 출력해야 합니다.
 
-그 후 각 패널은 자신의 스타일에 따라 다음 정보를 생성합니다:
-- 판단 방향: (입장 1 우세 / 입장 2 우세 / 중립)
-- 판단 근거: (간단한 사유 1~2줄)
+JSON 구조는 다음과 같습니다.
 
-절대 입장 1, 입장 2의 텍스트를 다시 복사하거나 길게 반복하지 마십시오.
-전체 출력은 JSON 배열 형태로만 작성하십시오.
-        `,
+{
+  "summary": "(사용자가 적은 사건을 3~5줄로 요약한 한국어 문장)",
+  "panels": [
+    {
+      "panel": "AI Panel #1",
+      "style": "사고 방식 설명(예: 사실 기반 논리 분석 전문가)",
+      "side": "입장 1 우세" 또는 "입장 2 우세" 또는 "중립" 중 하나,
+      "reason": "해당 판단을 한 간단한 이유(1~2문장)"
+    },
+    ...
+    (총 10개 패널)
+  ]
+}
+        `.trim(),
       },
       {
         role: "user",
         content: `
-다음은 사용자가 입력한 분쟁 내용입니다:
+다음은 사용자가 작성한 분쟁 내용입니다.
 
 "${text}"
 
-AI 패널 10명이 서로 다른 사고 방식으로 판단을 수행하세요.
-출력 형식은 반드시 아래 JSON과 동일해야 합니다:
+1. 위 사건을 3~5줄로 자연스럽게 요약해서 "summary" 필드에 넣으세요.
+2. 서로 다른 사고 방식을 가진 AI 패널 10명을 가정하고,
+   각 패널에 대해 "panel", "style", "side", "reason"을 채워서 "panels" 배열을 만드세요.
+3. "side" 값은 반드시 아래 셋 중 하나만 사용해야 합니다.
+   - "입장 1 우세"
+   - "입장 2 우세"
+   - "중립"
 
-[
-  {
-    "panel": "AI Panel #1",
-    "style": "(해당 패널의 사고 방식)",
-    "side": "입장 1 우세 / 입장 2 우세 / 중립 중 하나",
-    "reason": "(짧고 명확한 사유)"
-  }
-]
-
-단, 반드시 10개의 패널이 서로 다른 style을 가져야 합니다.
-      `,
+위에서 제시한 JSON 형식 하나만 출력하세요.
+        `.trim(),
       },
     ];
 
-    // OpenAI API 호출
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -86,27 +78,67 @@ AI 패널 10명이 서로 다른 사고 방식으로 판단을 수행하세요.
       }),
     });
 
-    const result = await response.json();
-
-    const raw = result.choices?.[0]?.message?.content || "[]";
-    let panels = [];
-
-    try {
-      panels = JSON.parse(raw);
-    } catch (err) {
-      console.error("JSON Parse Error:", err);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("OpenAI API error:", response.status, errorText);
+      return NextResponse.json(
+        { error: "OpenAI API 호출 실패" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({
-      summary: text,
-      panels,
-    });
+    const result = await response.json();
+    let raw: string = result.choices?.[0]?.message?.content ?? "";
+
+    // 🔍 디버그용 (로컬 개발 시 콘솔에서 응답 형태 확인)
+    console.log("RAW RESPONSE:", raw);
+
+    if (!raw || typeof raw !== "string") {
+      return NextResponse.json(
+        { error: "OpenAI 응답이 비어 있습니다." },
+        { status: 500 }
+      );
+    }
+
+    // ```json ... ``` 같은 코드블록 제거 + 앞뒤 잡스러운 텍스트 제거
+    raw = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
+
+    // 내용 중에서 첫 '{'부터 마지막 '}'까지를 잘라서 JSON으로 시도
+    const start = raw.indexOf("{");
+    const end = raw.lastIndexOf("}");
+    if (start === -1 || end === -1) {
+      console.error("No JSON braces found in:", raw);
+      return NextResponse.json(
+        { error: "JSON 형식을 찾을 수 없습니다." },
+        { status: 500 }
+      );
+    }
+
+    const jsonString = raw.slice(start, end + 1);
+
+    let data: any;
+    try {
+      data = JSON.parse(jsonString);
+    } catch (e) {
+      console.error("JSON parse error:", e, "\nJSON STRING:", jsonString);
+      return NextResponse.json(
+        { error: "JSON 파싱에 실패했습니다." },
+        { status: 500 }
+      );
+    }
+
+    // 최소 구조 검증
+    if (!data.summary || !Array.isArray(data.panels)) {
+      console.error("Invalid JSON structure:", data);
+      return NextResponse.json(
+        { error: "JSON 구조가 올바르지 않습니다." },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(data);
   } catch (error) {
     console.error("API error:", error);
-
-    return NextResponse.json(
-      { error: "서버 오류가 발생했습니다." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }

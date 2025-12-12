@@ -16,12 +16,11 @@ export default function ReportPage() {
 
   useEffect(() => {
     const text = localStorage.getItem("dispute_text");
+
     if (!text) {
       alert("분쟁 내용이 없습니다.");
       return;
     }
-
-    setSummary(text);
 
     // 🔥 서버 API 호출 → AI 패널 10명 판단 요청
     fetch("/api/analyze", {
@@ -31,7 +30,12 @@ export default function ReportPage() {
     })
       .then((res) => res.json())
       .then((data) => {
+        // AI가 생성한 요약 사용
+        setSummary(data.summary || text);
+
+        // 패널 목록 적용
         setPanels(data.panels || []);
+
         setLoading(false);
       })
       .catch((err) => {
@@ -117,21 +121,18 @@ export default function ReportPage() {
         >
           <thead>
             <tr style={{ background: "#eee" }}>
-              <th style={{ padding: 10, border: "1px solid #ddd" }}>패널</th>
-              <th style={{ padding: 10, border: "1px solid #ddd" }}>판단 방향</th>
-              <th style={{ padding: 10, border: "1px solid #ddd" }}>사유</th>
+              <th style={th}>패널</th>
+              <th style={th}>판단 방향</th>
+              <th style={th}>사유</th>
             </tr>
           </thead>
           <tbody>
             {panels.map((p, index) => (
               <tr key={index}>
-                <td style={{ padding: 10, border: "1px solid #ddd" }}>
-                  {p.panel}
-                </td>
+                <td style={td}>{p.panel}</td>
                 <td
                   style={{
-                    padding: 10,
-                    border: "1px solid #ddd",
+                    ...td,
                     fontWeight: 600,
                     color:
                       p.side === "입장 1 우세"
@@ -143,29 +144,54 @@ export default function ReportPage() {
                 >
                   {p.side}
                 </td>
-                <td style={{ padding: 10, border: "1px solid #ddd" }}>
-                  {p.reason}
-                </td>
+                <td style={td}>{p.reason}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {/* 3. 비율 */}
+        {/* 3. 종합 비율 */}
         <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32 }}>
           3. 종합 판단 비율
         </h2>
 
         <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
-          <StatCard label="입장 1 우세" value={percent(countPos1)} count={countPos1} color="#2b7cff" />
-          <StatCard label="중립" value={percent(countNeutral)} count={countNeutral} color="#777" />
-          <StatCard label="입장 2 우세" value={percent(countPos2)} count={countPos2} color="#d9534f" />
+          <StatCard
+            label="입장 1 우세"
+            value={percent(countPos1)}
+            count={countPos1}
+            color="#2b7cff"
+          />
+          <StatCard
+            label="중립"
+            value={percent(countNeutral)}
+            count={countNeutral}
+            color="#777"
+          />
+          <StatCard
+            label="입장 2 우세"
+            value={percent(countPos2)}
+            count={countPos2}
+            color="#d9534f"
+          />
         </div>
       </div>
     </div>
   );
 }
 
+// 스타일 공통
+const th = {
+  padding: 10,
+  border: "1px solid #ddd",
+};
+
+const td = {
+  padding: 10,
+  border: "1px solid #ddd",
+};
+
+// 통계 카드 컴포넌트
 function StatCard({ label, value, count, color }: any) {
   return (
     <div

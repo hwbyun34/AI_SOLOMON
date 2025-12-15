@@ -106,6 +106,7 @@ export default function FeedbackResultPage() {
           alignItems: "center",
           fontSize: 18,
           fontWeight: 600,
+          WebkitTextFillColor: "#000",
         }}
       >
         AI 솔로몬이 합의 솔루션을 정리하고 있습니다...

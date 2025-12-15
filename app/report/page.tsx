@@ -23,13 +23,12 @@ export default function ReportPage() {
       return;
     }
 
-    const MIN_LOADING_TIME = 20000; // 20초 유지
+    const MIN_LOADING_TIME = 20000;
     const start = Date.now();
 
     let aiFinished = false;
     let aiResult: any = null;
 
-    // 🔥 AI 요청
     fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -40,19 +39,12 @@ export default function ReportPage() {
         aiFinished = true;
         aiResult = data;
 
-        const elapsed = Date.now() - start;
-
-        // 20초 통과 이후면 바로 표시
-        if (elapsed >= MIN_LOADING_TIME) {
+        if (Date.now() - start >= MIN_LOADING_TIME) {
           applyResult(aiResult);
         }
       })
-      .catch((err) => {
-        console.error(err);
-        alert("AI 분석 요청 실패");
-      });
+      .catch(() => alert("AI 분석 요청 실패"));
 
-    // 🔥 20초 타이머
     const timer = setTimeout(() => {
       if (aiFinished && aiResult) {
         applyResult(aiResult);
@@ -68,7 +60,6 @@ export default function ReportPage() {
     setLoading(false);
   }
 
-  // 🔥 로딩 화면 (20초 유지)
   if (loading) {
     return (
       <div
@@ -79,6 +70,9 @@ export default function ReportPage() {
           alignItems: "center",
           fontSize: 20,
           fontWeight: 600,
+          color: "#000",
+          background: "#f7f7f7",
+          colorScheme: "light",
         }}
       >
         AI 패널 10명이 보고서를 작성 중입니다...
@@ -86,7 +80,6 @@ export default function ReportPage() {
     );
   }
 
-  // 통계 계산
   const countPos1 = panels.filter((p) => p.side === "입장 1 우세").length;
   const countPos2 = panels.filter((p) => p.side === "입장 2 우세").length;
   const countNeutral = panels.filter((p) => p.side === "중립").length;
@@ -99,6 +92,7 @@ export default function ReportPage() {
         background: "#f7f7f7",
         padding: "40px 20px",
         boxSizing: "border-box",
+        colorScheme: "light", // 🔥 다크모드 개입 차단
       }}
     >
       <div
@@ -109,6 +103,7 @@ export default function ReportPage() {
           padding: 32,
           borderRadius: 16,
           boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
+          color: "#000",
         }}
       >
         <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 12 }}>
@@ -125,6 +120,7 @@ export default function ReportPage() {
             marginTop: 8,
             whiteSpace: "pre-wrap",
             lineHeight: 1.6,
+            color: "#000",
           }}
         >
           {summary}
@@ -141,6 +137,7 @@ export default function ReportPage() {
             borderCollapse: "collapse",
             marginTop: 12,
             fontSize: 14,
+            color: "#000",
           }}
         >
           <thead>
@@ -163,7 +160,7 @@ export default function ReportPage() {
                         ? "#2b7cff"
                         : p.side === "입장 2 우세"
                         ? "#d9534f"
-                        : "#777",
+                        : "#555",
                   }}
                 >
                   {p.side}
@@ -180,27 +177,12 @@ export default function ReportPage() {
         </h2>
 
         <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
-          <StatCard
-            label="입장 1 우세"
-            value={percent(countPos1)}
-            count={countPos1}
-            color="#2b7cff"
-          />
-          <StatCard
-            label="중립"
-            value={percent(countNeutral)}
-            count={countNeutral}
-            color="#777"
-          />
-          <StatCard
-            label="입장 2 우세"
-            value={percent(countPos2)}
-            count={countPos2}
-            color="#d9534f"
-          />
+          <StatCard label="입장 1 우세" value={percent(countPos1)} count={countPos1} color="#2b7cff" />
+          <StatCard label="중립" value={percent(countNeutral)} count={countNeutral} color="#555" />
+          <StatCard label="입장 2 우세" value={percent(countPos2)} count={countPos2} color="#d9534f" />
         </div>
 
-        {/* 🔥 강조 버튼 */}
+        {/* 버튼 */}
         <div style={{ textAlign: "center", marginTop: 50 }}>
           <button
             onClick={() => router.push("/feedback")}
@@ -216,12 +198,6 @@ export default function ReportPage() {
               boxShadow: "0 10px 30px rgba(74,110,245,0.55)",
               transition: "0.25s",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.085)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-            }}
           >
             💡 피드백 솔루션 제공받기
           </button>
@@ -234,11 +210,14 @@ export default function ReportPage() {
 const th = {
   padding: 10,
   border: "1px solid #ddd",
+  backgroundColor: "#eee",
+  color: "#000",
 };
 
 const td = {
   padding: 10,
   border: "1px solid #ddd",
+  color: "#000",
 };
 
 function StatCard({ label, value, count, color }: any) {
@@ -251,11 +230,12 @@ function StatCard({ label, value, count, color }: any) {
         borderRadius: 12,
         textAlign: "center",
         minWidth: 120,
+        color: "#000",
       }}
     >
       <div style={{ fontWeight: 600, marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 700, color }}>{value}%</div>
-      <div style={{ fontSize: 12, color: "#777" }}>({count} / 10명)</div>
+      <div style={{ fontSize: 12, color: "#555" }}>({count} / 10명)</div>
     </div>
   );
 }

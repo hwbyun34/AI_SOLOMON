@@ -8,32 +8,30 @@ export default function LoadingPage() {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
-    // 20초 동안 자연스럽게 5단계 문구가 넘어가도록 설정
     const messages = [
       "AI 솔로몬이 사건을 읽고 핵심 요소를 파악하는 중입니다...",
-      "관련 유사 판례와 논리를 탐색하고 있습니다...",
-      "증거·사실관계를 구조화하고 있습니다...",
-      "AI 패널들이 각각 의견을 정리하는 중입니다...",
-      "최종 결론을 생성하고 있습니다..."
+      "관련 유사 사례와 논리를 탐색하는 중입니다...",
+      "AI 패널들이 각각 의견을 정리하고 있습니다...",
+      "곧 분석 보고서를 생성합니다..."
     ];
 
     messages.forEach((_, index) => {
-      setTimeout(() => setPhase(index), index * 4000); // 4초 × 5단계 = 총 20초
+      setTimeout(() => setPhase(index), index * 900);
     });
 
     const timer = setTimeout(() => {
       router.push("/report");
-    }, 20000); // 20초 후 리포트 페이지 이동
+    }, 3600);
 
     return () => clearTimeout(timer);
   }, [router]);
 
+  // 변화하는 문장 리스트
   const messages = [
     "AI 솔로몬이 사건을 읽고 핵심 요소를 파악하는 중입니다...",
-    "관련 유사 판례와 논리를 탐색하고 있습니다...",
-    "증거·사실관계를 구조화하고 있습니다...",
-    "AI 패널들이 각각 의견을 정리하는 중입니다...",
-    "최종 결론을 생성하고 있습니다..."
+    "관련 유사 사례와 논리를 탐색하는 중입니다...",
+    "AI 패널들이 각각 의견을 정리하고 있습니다...",
+    "곧 분석 보고서를 생성합니다..."
   ];
 
   return (
@@ -46,6 +44,7 @@ export default function LoadingPage() {
         alignItems: "center",
         padding: 20,
         boxSizing: "border-box",
+        WebkitTextFillColor: "#000",
       }}
     >
       <div
@@ -58,6 +57,7 @@ export default function LoadingPage() {
           boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
           textAlign: "center",
           position: "relative",
+          WebkitTextFillColor: "#000",
         }}
       >
         {/* 제목 */}
@@ -79,6 +79,7 @@ export default function LoadingPage() {
             color: "#555",
             marginBottom: 24,
             transition: "opacity 0.3s",
+            WebkitTextFillColor: "#000",
           }}
         >
           {messages[phase]}
@@ -95,50 +96,41 @@ export default function LoadingPage() {
               borderRadius: "50%",
               margin: "0 auto",
               animation: "spin 1s linear infinite",
+              WebkitTextFillColor: "#000",
             }}
           />
         </div>
 
-        {/* Google AdSense 광고 자리 */}
+        {/* 광고 자리 */}
         <div
           style={{
             marginTop: 20,
             padding: 16,
             background: "#fafafa",
             borderRadius: 12,
-            minHeight: 180,
+            minHeight: 120,
             fontSize: 13,
             color: "#777",
             border: "1px solid #eee",
             lineHeight: 1.6,
+            WebkitTextFillColor: "#000",
           }}
         >
-          <strong>🔸 광고 영역 (AdSense Auto Ads / Display Ad)</strong>
+          🔸 <strong>광고 영역(Ad)</strong>
           <br />
-          아래에 Google 광고가 자동으로 삽입됩니다.
-
-          <div style={{ marginTop: 10 }}>
-            <ins
-              className="adsbygoogle"
-              style={{ display: "block" }}
-              data-ad-client="ca-pub-5086983825808143"
-              data-ad-slot="1234567890"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            ></ins>
-          </div>
+          여기에 Google AdSense, 배너 광고 또는 파트너 광고를 넣을 수 있습니다.
+          <br />
+          분석 대기 시간 동안 자연스럽게 노출되어 수익 창출이 가능합니다.
         </div>
-
-        {/* 스핀 애니메이션 */}
-        <style>{`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-          
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        `}</style>
       </div>
+
+      {/* animation keyframes */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

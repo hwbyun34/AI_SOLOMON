@@ -168,7 +168,7 @@ export default function FeedbackResultPage() {
           boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
         }}
       >
-        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 , WebkitTextFillColor: "#000", }}>
           🤝 AI 솔로몬 합의 솔루션 보고서
         </h1>
         <p style={{ fontSize: 13, color: "#777" }}>
@@ -291,11 +291,13 @@ const box = {
   padding: 16,
   borderRadius: 12,
   border: "1px solid #eee",
+  WebkitTextFillColor: "#000",
 };
 
 const h3 = {
   fontSize: 16,
   fontWeight: 700,
+  WebkitTextFillColor: "#000",
 };
 
 const p = {
@@ -303,4 +305,5 @@ const p = {
   fontSize: 14,
   color: "#555",
   whiteSpace: "pre-wrap" as const,
+  WebkitTextFillColor: "#000",
 };

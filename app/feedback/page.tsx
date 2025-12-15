@@ -47,6 +47,7 @@ export default function FeedbackLoadingPage() {
         alignItems: "center",
         padding: 20,
         boxSizing: "border-box",
+        WebkitTextFillColor: "#000",
       }}
     >
       <div
@@ -59,6 +60,7 @@ export default function FeedbackLoadingPage() {
           boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
           textAlign: "center",
           position: "relative",
+          WebkitTextFillColor: "#000",
         }}
       >
         {/* 제목 */}
@@ -67,6 +69,7 @@ export default function FeedbackLoadingPage() {
             fontSize: 22,
             fontWeight: 700,
             marginBottom: 16,
+            WebkitTextFillColor: "#000",
           }}
         >
           AI 솔로몬이 피드백 솔루션을 생성 중입니다...
@@ -80,6 +83,7 @@ export default function FeedbackLoadingPage() {
             color: "#555",
             marginBottom: 24,
             transition: "opacity 0.3s",
+            WebkitTextFillColor: "#000",
           }}
         >
           {messages[phase]}
@@ -96,6 +100,7 @@ export default function FeedbackLoadingPage() {
               borderRadius: "50%",
               margin: "0 auto",
               animation: "spin 1s linear infinite",
+              WebkitTextFillColor: "#000",
             }}
           />
         </div>
@@ -112,6 +117,7 @@ export default function FeedbackLoadingPage() {
             color: "#777",
             border: "1px solid #eee",
             lineHeight: 1.6,
+            WebkitTextFillColor: "#000",
           }}
         >
           <strong>🔸 광고 영역 (AdSense Auto Ads / Display Ad)</strong>

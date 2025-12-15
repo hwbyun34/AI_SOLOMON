@@ -44,6 +44,7 @@ export default function Home() {
             fontSize: 28,
             fontWeight: 700,
             marginBottom: 8,
+            WebkitTextFillColor: "#000",
           }}
         >
           AI 솔로몬
@@ -53,7 +54,9 @@ export default function Home() {
         </p>
 
         {/* 라벨 */}
-        <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 15 }}>
+        <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 15,
+                      WebkitTextFillColor: "#000",
+         }}>
           📝 분쟁 내용을 입력해주세요
         </div>
 
@@ -72,6 +75,7 @@ export default function Home() {
             fontSize: 14,
             lineHeight: 1.6,
             boxSizing: "border-box",
+            WebkitTextFillColor: "#000",
           }}
         />
 
@@ -85,6 +89,7 @@ export default function Home() {
             lineHeight: 1.6,
             fontSize: 13,
             color: "#555",
+            
           }}
         >
           <strong style={{ fontWeight: 600 }}>✦ 작성 가이드</strong>

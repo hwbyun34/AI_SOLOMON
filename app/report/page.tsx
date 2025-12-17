@@ -10,6 +10,19 @@ type Panel = {
   reason: string;
 };
 
+const panelNameMap: Record<string, string> = {
+  "사실관계 정합성 분석 패널": "🔍 팩트봇",
+  "증거 신뢰도 및 근거 충족성 평가 패널": "📎 증거봇",
+  "논리 구조 일관성 검증 패널": "🧠 논리봇",
+  "행위 인과관계 분석 패널": "🔗 인과봇",
+  "제3자 관점 사실 판단 패널": "👀 시점봇",
+  "감정 반응 및 심리 영향 분석 패널": "❤️ 감정봇",
+  "사회적 책임 및 도덕 규범 관점 패널": "⚖️ 도덕봇",
+  "일반인 인식 및 상식 기준 판단 패널": "👥 상식봇",
+  "분쟁 구조 지속성 및 재발 가능성 분석 패널": "🔁 재발봇",
+  "객관·중립 종합 판단 패널": "🏛️ 솔로몬봇",
+};
+
 export default function ReportPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -142,7 +155,7 @@ export default function ReportPage() {
         >
           <thead>
             <tr style={{ background: "#eee" }}>
-              <th style={th}>패널 성향</th>
+              <th style={th}>AI</th>
               <th style={th}>판단 방향</th>
               <th style={th}>사유</th>
             </tr>
@@ -150,11 +163,15 @@ export default function ReportPage() {
           <tbody>
             {panels.map((p, index) => (
               <tr key={index}>
-                <td style={td}>{p.style}</td>
+                <td style={{ ...td, whiteSpace: 'nowrap' }}>
+                  {panelNameMap[p.style] ?? p.style}
+                </td>
                 <td
                   style={{
                     ...td,
                     fontWeight: 600,
+                    whiteSpace: "nowrap",      // ✅ 줄바꿈 방지
+                    textAlign: "center",       // (선택) 가독성 ↑
                     color:
                       p.side === "입장 1 우세"
                         ? "#2b7cff"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type FeedbackSolution = {
   a_summary: string;
@@ -16,22 +17,27 @@ type FeedbackSolution = {
 };
 
 export default function FeedbackResultPage() {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FeedbackSolution | null>(null);
 
   /* ===========================
-     ✅ 카카오 SDK 초기화 (추가)
+     카카오 SDK 초기화
   =========================== */
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).Kakao) {
       const Kakao = (window as any).Kakao;
       if (!Kakao.isInitialized()) {
-        Kakao.init("카카오_자바스크립트_키"); // ← 네 키
+        Kakao.init("카카오_자바스크립트_키"); // 네 키
       }
     }
   }, []);
 
+  /* ===========================
+     솔루션 데이터 로딩
+  =========================== */
   useEffect(() => {
     const text = localStorage.getItem("dispute_text");
 
@@ -66,7 +72,7 @@ export default function FeedbackResultPage() {
   }, []);
 
   /* ===========================
-     ✅ 카카오톡 공유 함수 (추가)
+     카카오톡 공유
   =========================== */
   const shareKakao = () => {
     const Kakao = (window as any).Kakao;
@@ -95,6 +101,22 @@ export default function FeedbackResultPage() {
     });
   };
 
+  /* ===========================
+     6단계 광고 페이지로 이동
+  =========================== */
+  const goToStep6Ad = () => {
+    if (!data) return;
+
+    // 7단계에서 사용할 데이터 저장
+    localStorage.setItem("incident_summary", data.joint_summary);
+    localStorage.setItem("solution_direction", data.solution.main_direction);
+
+    router.push("/step6-ad");
+  };
+
+  /* ===========================
+     로딩 / 에러 처리
+  =========================== */
   if (loading) {
     return (
       <div
@@ -148,6 +170,9 @@ export default function FeedbackResultPage() {
 
   const { a_summary, b_summary, joint_summary, solution, caution } = data;
 
+  /* ===========================
+     본문
+  =========================== */
   return (
     <div
       style={{
@@ -169,10 +194,19 @@ export default function FeedbackResultPage() {
           boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
         }}
       >
-        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 , WebkitTextFillColor: "#000", }}>
+        <h1
+          style={{
+            fontSize: 28,
+            fontWeight: 800,
+            marginBottom: 12,
+            color: "#1a365d",
+            WebkitTextFillColor: "#1a365d",
+          }}
+        >
           🤝 AI 솔로몬 합의 솔루션 보고서
         </h1>
-        <p style={{ fontSize: 13, color: "#777" }}>
+
+        <p style={{ fontSize: 15, color: "#4a5568", lineHeight: 1.6 }}>
           양쪽 입장을 모두 고려하여, 감정적인 상처는 줄이고 현실적인 해결을 돕기 위한 제안입니다.
         </p>
 
@@ -206,14 +240,14 @@ export default function FeedbackResultPage() {
         <div
           style={{
             marginTop: 24,
-            background: "#f0f4ff",
-            padding: 16,
+            background: "#f8f9ff",
+            padding: 20,
             borderRadius: 12,
-            border: "1px solid #d6e0ff",
+            border: "1px solid #e2e8ff",
           }}
         >
           <h3 style={h3}>합의의 큰 방향</h3>
-          <p style={{ ...p, color: "#333" }}>{solution.main_direction}</p>
+          <p style={{ ...p, color: "#2d3748" }}>{solution.main_direction}</p>
         </div>
 
         {/* 단계 */}
@@ -237,7 +271,7 @@ export default function FeedbackResultPage() {
             gap: 16,
           }}
         >
-          <div style={{ ...box, background: "#fff7f0", border: "1px solid #ffe0c2" }}>
+          <div style={{ ...box, background: "#fffaf7", border: "1px solid #ffedd5" }}>
             <h3 style={h3}>A가 써볼 수 있는 말</h3>
             <ul>
               {solution.phrases_for_a.map((s, i) => (
@@ -246,7 +280,7 @@ export default function FeedbackResultPage() {
             </ul>
           </div>
 
-          <div style={{ ...box, background: "#f0fff4", border: "1px solid #c2ffd7" }}>
+          <div style={{ ...box, background: "#f7fff9", border: "1px solid #d1fae5" }}>
             <h3 style={h3}>B가 써볼 수 있는 말</h3>
             <ul>
               {solution.phrases_for_b.map((s, i) => (
@@ -257,29 +291,51 @@ export default function FeedbackResultPage() {
         </div>
 
         {/* 주의 */}
-        <div style={{ ...box, marginTop: 24, background: "#fff5f5", border: "1px solid #ffd6d6" }}>
-          <h3 style={{ ...h3, color: "#c0392b" }}>주의해야 할 점</h3>
+        <div style={{ ...box, marginTop: 24, background: "#fff8f8", border: "1px solid #ffebeb" }}>
+          <h3 style={{ ...h3, color: "#e53e3e" as const }}>주의해야 할 점</h3>
           <p style={p}>{caution}</p>
         </div>
 
-        {/* ✅ 카카오톡 공유 버튼 (여기만 추가됨) */}
-        <div style={{ textAlign: "center", marginTop: 48 }}>
-          <button
-            onClick={shareKakao}
-            style={{
-              background: "#FEE500",
-              color: "#000",
-              padding: "16px 32px",
-              borderRadius: 14,
-              border: "none",
-              fontSize: 16,
-              fontWeight: 700,
-              cursor: "pointer",
-              boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-            }}
-          >
-            📤 카카오톡으로 공유하기
-          </button>
+        {/* 👉 6단계 이동 버튼 */}
+        <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: 50, flexWrap: "wrap" }}>
+          <div>
+            <button
+              onClick={goToStep6Ad}
+              style={{
+                background: "linear-gradient(135deg, #2b6cb0, #4299e1)",
+                color: "#fff",
+                padding: "16px 32px",
+                borderRadius: 14,
+                border: "none",
+                fontSize: 16,
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                whiteSpace: "nowrap"
+              }}
+            >
+              ✍️ 합의 · 재발방지 문서 작성하기
+            </button>
+          </div>
+          <div>
+            <button
+              onClick={shareKakao}
+              style={{
+                background: "#d8d513ff",
+                color: "#fff",
+                padding: "16px 32px",
+                borderRadius: 14,
+                border: "none",
+                fontSize: 16,
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                whiteSpace: "nowrap"
+              }}
+            >
+              📤 카카오톡으로 공유하기
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -288,23 +344,30 @@ export default function FeedbackResultPage() {
 
 /* ===== 공통 스타일 ===== */
 const box = {
-  background: "#fafafa",
-  padding: 16,
+  background: "#ffffff",
+  padding: 20,
   borderRadius: 12,
-  border: "1px solid #eee",
-  WebkitTextFillColor: "#000",
+  border: "1px solid #f0f0f0",
+  boxShadow: "0 2px 12px rgba(0, 0, 0, 0.03)",
+  WebkitTextFillColor: "#1a1a1a",
+  transition: "all 0.3s ease",
 };
 
 const h3 = {
-  fontSize: 16,
+  fontSize: 17,
   fontWeight: 700,
-  WebkitTextFillColor: "#000",
+  color: "#1a365d",
+  marginBottom: 12,
+  position: "relative" as const,
+  paddingBottom: 8,
+  WebkitTextFillColor: "#1a365d",
 };
 
 const p = {
   marginTop: 8,
-  fontSize: 14,
-  color: "#555",
+  fontSize: 15,
+  lineHeight: 1.7,
+  color: "#2d3748",
   whiteSpace: "pre-wrap" as const,
-  WebkitTextFillColor: "#000",
+  WebkitTextFillColor: "#2d3748",
 };

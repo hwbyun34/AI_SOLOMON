@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* =========================
+   Color System (Light)
+   ========================= */
+:root {
+  --bg-main: #f7f7f7;
+  --bg-card: #ffffff;
+  --bg-soft: #fafafa;
+
+  --text-main: #171717;
+  --text-sub: #555555;
+  --text-muted: #777777;
+
+  --border-light: #e5e7eb;
+}
+
+/* =========================
+   Dark Mode
+   ========================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-main: #0a0a0a;
+    --bg-card: #1c1c1e;
+    --bg-soft: #2a2a2e;
+
+    --text-main: #ededed;
+    --text-sub: #d1d1d1;
+    --text-muted: #a1a1aa;
+
+    --border-light: #333333;
+  }
+}
+
+/* =========================
+   Base
+   ========================= */
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: Arial, Helvetica, sans-serif;
+}

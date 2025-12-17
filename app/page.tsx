@@ -1,122 +1,189 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+const panels = [
+  { name: "🔍 팩트봇", desc: "사건 흐름·진술 정합성·모순 여부를 점검합니다." },
+  { name: "📎 증거봇", desc: "주장을 뒷받침하는 근거의 신뢰도와 충분성을 평가합니다." },
+  { name: "🧠 논리봇", desc: "논리 비약·모순·인과 오류 등 논리 구조를 검토합니다." },
+  { name: "🔗 인과봇", desc: "행동이 결과에 미친 영향과 인과관계를 분석합니다." },
+  { name: "👀 시점봇", desc: "당사자 밖의 시선으로 사건을 재구성해 판단합니다." },
+  { name: "❤️ 감정봇", desc: "갈등의 심리적 맥락과 감정 반응의 배경을 파악합니다." },
+  { name: "⚖️ 도덕봇", desc: "책임·규범·도덕 관점에서 타당성을 검토합니다." },
+  { name: "👥 상식봇", desc: "일반적인 상식과 대중 인식 기준의 설득력을 평가합니다." },
+  { name: "🔁 재발봇", desc: "갈등 재발 가능성과 구조적 위험 요인을 점검합니다." },
+  { name: "🏛️ 솔로몬봇", desc: "모든 관점을 종합해 설득력과 해결 방향을 정리합니다." },
+];
+
+export default function LandingPage() {
   const router = useRouter();
-  const [text, setText] = useState("");
-
-  const handleNext = () => {
-    if (!text.trim()) {
-      alert("분쟁 내용을 입력해주세요.");
-      return;
-    }
-
-    // 로딩/광고 페이지로 텍스트 전달
-    localStorage.setItem("dispute_text", text);
-    router.push("/loading");
-  };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#f7f7f7",
         padding: "40px 20px",
-        boxSizing: "border-box",
+        background: "#f5f6f8", // 🔹 메인 배경만 연한 흰톤
       }}
     >
-      {/* 가운데 정렬된 컨테이너 */}
       <div
         style={{
-          maxWidth: 800,
+          maxWidth: 1000,
           margin: "0 auto",
-          background: "#fff",
-          padding: "32px",
-          borderRadius: 16,
-          boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
+          background: "#ffffff", // 🔹 카드 완전 흰색
+          padding: 36,
+          borderRadius: 18,
+          boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
         }}
       >
-        {/* 헤더 */}
-        <h1
-          style={{
-            fontSize: 28,
-            fontWeight: 700,
-            marginBottom: 8,
-            WebkitTextFillColor: "#000",
-          }}
-        >
+        {/* Header */}
+        <h1 style={{ fontSize: 30, fontWeight: 800, marginBottom: 8, color: "#111" }}>
           AI 솔로몬
         </h1>
-        <p style={{ color: "#666", marginBottom: 24, fontSize: 14 }}>
-          분쟁 상황을 입력하면 AI가 사건을 분석하고 대응 보고서를 생성해드립니다.
-        </p>
-
-        {/* 라벨 */}
-        <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 15,
-                      WebkitTextFillColor: "#000",
-         }}>
-          📝 분쟁 내용을 입력해주세요
-        </div>
-
-        {/* 대형 입력 박스 */}
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={`예시)\n- 남자친구 , 여자친구의 의견이 충돌하여 갈등을 빚고있는 상황\n- 상대방과 의견 충돌이 지속되어 조정이나 대응 문서가 필요한 상황\n- 금전·물품·계약 관련 문제로 서로의 입장이 크게 엇갈리는 상황\n- 의사소통이 원활하지 않아 오해가 쌓이고 갈등이 심화된 상황`}
+        <p
           style={{
-            width: "100%",
-            height: 320,
-            padding: 16,
-            borderRadius: 12,
-            border: "1px solid #ccc",
-            resize: "none",
-            fontSize: 14,
-            lineHeight: 1.6,
-            boxSizing: "border-box",
-            WebkitTextFillColor: "#000",
-          }}
-        />
-
-        {/* 작성 팁 */}
-        <div
-          style={{
-            background: "#fafafa",
-            padding: 16,
-            borderRadius: 12,
-            marginTop: 20,
-            lineHeight: 1.6,
-            fontSize: 13,
+            fontSize: 18,
             color: "#555",
-            
+            lineHeight: 1.6,
+            marginBottom: 28,
           }}
         >
-          <strong style={{ fontWeight: 600 }}>✦ 작성 가이드</strong>
-          <ul style={{ marginTop: 8, paddingLeft: 20 }}>
-            <li>언제, 어디서, 누구와 발생한 일인지 설명해주세요.</li>
-            <li>A의 의견 B의 의견을 분리해서 설명하면 더 정확한 분석 결과를 얻을수 있습니다.</li>
-            <li>복잡한 사건일수록 더 정확한 분석이 가능합니다.</li>
-          </ul>
+          하나의 판단이 아닌, <b>10개의 AI 관점</b>으로 분쟁을 분석합니다.
+          <br />
+          설득력 있는 입장을 정리하고, 화해 솔루션과
+          재발방지·합의서 초안까지 제공합니다.
+        </p>
+
+        {/* Bots */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 14,
+          }}
+        >
+          {panels.map((p) => (
+            <div
+              key={p.name}
+              style={{
+                background: "#fafafa",
+                border: "1px solid #e5e7eb",
+                borderRadius: 14,
+                padding: 16,
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: 700,
+                  fontSize: 14,
+                  marginBottom: 6,
+                  color: "#111",
+                }}
+              >
+                {p.name}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                  color: "#555",
+                }}
+              >
+                {p.desc}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* 버튼 */}
-        <button
-          onClick={handleNext}
+        {/* Flow */}
+        <div
           style={{
-            marginTop: 28,
+            marginTop: 32,
+            paddingTop: 24,
+            borderTop: "1px solid #e5e7eb",
+          }}
+        >
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12, color: "#111" }}>
+            서비스 진행 흐름
+          </h3>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 12,
+            }}
+          >
+            {[
+              {
+                title: "1) 사건 입력",
+                desc: "분쟁 상황을 입력하면 A/B 주장과 사건 경과를 기반으로 분석이 시작됩니다.",
+              },
+              {
+                title: "2) 솔루션 제공",
+                desc: "10개 관점 분석을 종합해 설득력 있는 주장과 조정안을 제시합니다.",
+              },
+              {
+                title: "3) 재발방지·합의서 작성",
+                desc: "해결 방향을 문서로 정리합니다. 재발방지 각서·합의서 초안이 생성됩니다.",
+              },
+            ].map((s) => (
+              <div
+                key={s.title}
+                style={{
+                  background: "#fafafa",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 14,
+                  padding: 16,
+                }}
+              >
+                <div style={{ fontWeight: 700, marginBottom: 6, color: "#111" }}>
+                  {s.title}
+                </div>
+                <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6 }}>
+                  {s.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Notice */}
+          <div
+            style={{
+              marginTop: 16,
+              fontSize: 12,
+              color: "#666",
+              background: "#fafafa",
+              border: "1px solid #e5e7eb",
+              borderRadius: 12,
+              padding: 14,
+              lineHeight: 1.6,
+            }}
+          >
+            ※ 본 서비스는 법률·의학·심리 상담을 대체하지 않는 AI 기반 판단 보조
+            도구입니다. 결과물은 참고용 초안이며, 실제 적용 전 전문가 검토를
+            권장합니다.
+          </div>
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={() => router.push("/input")}
+          style={{
+            marginTop: 26,
             width: "100%",
             padding: "14px 0",
             borderRadius: 12,
             fontSize: 16,
-            fontWeight: 600,
+            fontWeight: 700,
             border: "none",
             background: "#000",
             color: "#fff",
             cursor: "pointer",
           }}
         >
-          AI에게 분석 요청하기 →
+          사건 입력하러 가기 →
         </button>
       </div>
     </div>

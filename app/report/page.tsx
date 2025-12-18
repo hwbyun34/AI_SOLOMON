@@ -36,6 +36,12 @@ export default function ReportPage() {
       return;
     }
 
+    const MIN_LOADING_TIME = 20000;
+    const start = Date.now();
+
+    let aiFinished = false;
+    let aiResult: any = null;
+
     fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -43,12 +49,28 @@ export default function ReportPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setSummary(data.summary);
-        setPanels(data.panels);
-        setLoading(false);
+        aiFinished = true;
+        aiResult = data;
+        if (Date.now() - start >= MIN_LOADING_TIME) {
+          applyResult(aiResult);
+        }
       })
       .catch(() => alert("AI 분석 요청 실패"));
+
+    const timer = setTimeout(() => {
+      if (aiFinished && aiResult) {
+        applyResult(aiResult);
+      }
+    }, MIN_LOADING_TIME);
+
+    return () => clearTimeout(timer);
   }, []);
+
+  function applyResult(data: any) {
+    setSummary(data.summary);
+    setPanels(data.panels);
+    setLoading(false);
+  }
 
   if (loading) {
     return (
@@ -91,24 +113,15 @@ export default function ReportPage() {
           padding: 32,
           borderRadius: 16,
           boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
-          color: "#000",
+          boxSizing: "border-box",
         }}
       >
-        {/* 제목 */}
-        <h1
-          style={{
-            fontSize: 26,
-            fontWeight: 700,
-            marginBottom: 12,
-            whiteSpace: "nowrap",
-            wordBreak: "keep-all",
-          }}
-        >
+        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 12 , color: "#000", }}>
           📄 AI 솔로몬 분쟁 분석 보고서
         </h1>
 
         {/* 사건 요약 */}
-        <h2 style={{ fontSize: 20, fontWeight: 600 }}>1. 사건 요약</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 600 , color: "#000", }}>1. 사건 요약</h2>
         <div
           style={{
             background: "#fafafa",
@@ -124,69 +137,73 @@ export default function ReportPage() {
         </div>
 
         {/* 패널 분석 */}
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32,color: "#000", }}>
           2. AI 패널별 분석 결과
         </h2>
 
-        {/* ✅ 여기만 추가됨 (모바일 대응) */}
-        <div style={{ width: "100%", overflowX: "auto" }}>
-          <table
-            style={{
-              width: "100%",
-              minWidth: 420, // 🔑 모바일에서 글자 찢어짐 방지
-              borderCollapse: "collapse",
-              marginTop: 12,
-              fontSize: 14,
-              color: "#000",
-            }}
-          >
-            <thead>
-              <tr style={{ background: "#eee" }}>
-                <th style={th}>AI</th>
-                <th style={th}>판단 방향</th>
-                <th style={th}>사유</th>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            marginTop: 12,
+            fontSize: 14,
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#eee" }}>
+              <th style={th}>AI</th>
+              <th style={th}>판단 방향</th>
+              <th style={th}>사유</th>
+            </tr>
+          </thead>
+          <tbody>
+            {panels.map((p, index) => (
+              <tr key={index}>
+                <td style={{ ...td, whiteSpace: "nowrap" }}>
+                  {panelNameMap[p.style] ?? p.style}
+                </td>
+                <td
+                  style={{
+                    ...td,
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                    textAlign: "center",
+                    color:
+                      p.side === "입장 1 우세"
+                        ? "#2b7cff"
+                        : p.side === "입장 2 우세"
+                        ? "#d9534f"
+                        : "#555",
+                  }}
+                >
+                  {p.side}
+                </td>
+                <td style={td}>{p.reason}</td>
               </tr>
-            </thead>
-            <tbody>
-              {panels.map((p, index) => (
-                <tr key={index}>
-                  <td style={{ ...td, whiteSpace: "nowrap" }}>
-                    {panelNameMap[p.style] ?? p.style}
-                  </td>
-                  <td
-                    style={{
-                      ...td,
-                      fontWeight: 600,
-                      whiteSpace: "nowrap",
-                      textAlign: "center",
-                      color:
-                        p.side === "입장 1 우세"
-                          ? "#2b7cff"
-                          : p.side === "입장 2 우세"
-                          ? "#d9534f"
-                          : "#555",
-                    }}
-                  >
-                    {p.side}
-                  </td>
-                  <td style={td}>{p.reason}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
 
-        {/* 종합 판단 */}
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32 }}>
+        {/* 종합 판단 비율 */}
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32,color: "#000", }}>
           3. 종합 판단 비율
         </h2>
 
-        <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
+        {/* 🔥 여기만 Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 20,
+            marginTop: 12,
+          }}
+        >
           <StatCard label="입장 1 우세" value={percent(countPos1)} count={countPos1} color="#2b7cff" />
           <StatCard label="중립" value={percent(countNeutral)} count={countNeutral} color="#555" />
           <StatCard label="입장 2 우세" value={percent(countPos2)} count={countPos2} color="#d9534f" />
         </div>
 
+        {/* 버튼 */}
         <div style={{ textAlign: "center", marginTop: 50 }}>
           <button
             onClick={() => router.push("/feedback")}
@@ -227,12 +244,10 @@ function StatCard({ label, value, count, color }: any) {
   return (
     <div
       style={{
-        flex: 1,
         background: "#fafafa",
         padding: 16,
         borderRadius: 12,
         textAlign: "center",
-        minWidth: 120,
         color: "#000",
       }}
     >

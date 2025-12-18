@@ -91,7 +91,7 @@ export default function ReportPage() {
           padding: 32,
           borderRadius: 16,
           boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
-          color: "#000", // ✅ 색상 고정 (사이드이펙트 제거)
+          color: "#000",
         }}
       >
         {/* 제목 */}
@@ -100,8 +100,8 @@ export default function ReportPage() {
             fontSize: 26,
             fontWeight: 700,
             marginBottom: 12,
-            whiteSpace: "nowrap",   // ✅ 줄바꿈 방지
-            wordBreak: "keep-all",  // ✅ 한글 분리 방지
+            whiteSpace: "nowrap",
+            wordBreak: "keep-all",
           }}
         >
           📄 AI 솔로몬 분쟁 분석 보고서
@@ -128,49 +128,53 @@ export default function ReportPage() {
           2. AI 패널별 분석 결과
         </h2>
 
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: 12,
-            fontSize: 14,
-            color: "#000",
-          }}
-        >
-          <thead>
-            <tr style={{ background: "#eee" }}>
-              <th style={th}>AI</th>
-              <th style={th}>판단 방향</th>
-              <th style={th}>사유</th>
-            </tr>
-          </thead>
-          <tbody>
-            {panels.map((p, index) => (
-              <tr key={index}>
-                <td style={{ ...td, whiteSpace: "nowrap" }}>
-                  {panelNameMap[p.style] ?? p.style}
-                </td>
-                <td
-                  style={{
-                    ...td,
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                    textAlign: "center",
-                    color:
-                      p.side === "입장 1 우세"
-                        ? "#2b7cff"
-                        : p.side === "입장 2 우세"
-                        ? "#d9534f"
-                        : "#555",
-                  }}
-                >
-                  {p.side}
-                </td>
-                <td style={td}>{p.reason}</td>
+        {/* ✅ 여기만 추가됨 (모바일 대응) */}
+        <div style={{ width: "100%", overflowX: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              minWidth: 420, // 🔑 모바일에서 글자 찢어짐 방지
+              borderCollapse: "collapse",
+              marginTop: 12,
+              fontSize: 14,
+              color: "#000",
+            }}
+          >
+            <thead>
+              <tr style={{ background: "#eee" }}>
+                <th style={th}>AI</th>
+                <th style={th}>판단 방향</th>
+                <th style={th}>사유</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {panels.map((p, index) => (
+                <tr key={index}>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>
+                    {panelNameMap[p.style] ?? p.style}
+                  </td>
+                  <td
+                    style={{
+                      ...td,
+                      fontWeight: 600,
+                      whiteSpace: "nowrap",
+                      textAlign: "center",
+                      color:
+                        p.side === "입장 1 우세"
+                          ? "#2b7cff"
+                          : p.side === "입장 2 우세"
+                          ? "#d9534f"
+                          : "#555",
+                    }}
+                  >
+                    {p.side}
+                  </td>
+                  <td style={td}>{p.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {/* 종합 판단 */}
         <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32 }}>

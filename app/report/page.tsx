@@ -51,7 +51,6 @@ export default function ReportPage() {
       .then((data) => {
         aiFinished = true;
         aiResult = data;
-
         if (Date.now() - start >= MIN_LOADING_TIME) {
           applyResult(aiResult);
         }
@@ -83,9 +82,8 @@ export default function ReportPage() {
           alignItems: "center",
           fontSize: 20,
           fontWeight: 600,
-          color: "#000",
           background: "#f7f7f7",
-          colorScheme: "light",
+          color: "#000",
         }}
       >
         AI 패널 10명이 보고서를 작성 중입니다...
@@ -105,8 +103,7 @@ export default function ReportPage() {
         background: "#f7f7f7",
         padding: "40px 20px",
         boxSizing: "border-box",
-        colorScheme: "light",
-        overflowX: "hidden",
+        overflowX: "hidden", // ✅ 페이지 밀림 최종 차단
       }}
     >
       <div
@@ -133,7 +130,6 @@ export default function ReportPage() {
             marginTop: 8,
             whiteSpace: "pre-wrap",
             lineHeight: 1.6,
-            color: "#000",
           }}
         >
           {summary}
@@ -150,7 +146,6 @@ export default function ReportPage() {
               borderCollapse: "collapse",
               marginTop: 12,
               fontSize: 14,
-              color: "#000",
             }}
           >
             <thead>
@@ -163,15 +158,14 @@ export default function ReportPage() {
             <tbody>
               {panels.map((p, index) => (
                 <tr key={index}>
-                  <td style={{ ...td, whiteSpace: "nowrap" }}>
+                  <td style={td}>
                     {panelNameMap[p.style] ?? p.style}
                   </td>
                   <td
                     style={{
                       ...td,
-                      fontWeight: 600,
-                      whiteSpace: "nowrap",
                       textAlign: "center",
+                      fontWeight: 600,
                       color:
                         p.side === "입장 1 우세"
                           ? "#2b7cff"
@@ -193,26 +187,10 @@ export default function ReportPage() {
           3. 종합 판단 비율
         </h2>
 
-        {/* ✅ 여기 flexWrap 한 줄만 추가됨 */}
         <div style={{ display: "flex", gap: 20, marginTop: 12, flexWrap: "wrap" }}>
-          <StatCard
-            label="입장 1 우세"
-            value={percent(countPos1)}
-            count={countPos1}
-            color="#2b7cff"
-          />
-          <StatCard
-            label="중립"
-            value={percent(countNeutral)}
-            count={countNeutral}
-            color="#555"
-          />
-          <StatCard
-            label="입장 2 우세"
-            value={percent(countPos2)}
-            count={countPos2}
-            color="#d9534f"
-          />
+          <StatCard label="입장 1 우세" value={percent(countPos1)} count={countPos1} color="#2b7cff" />
+          <StatCard label="중립" value={percent(countNeutral)} count={countNeutral} color="#555" />
+          <StatCard label="입장 2 우세" value={percent(countPos2)} count={countPos2} color="#d9534f" />
         </div>
 
         <div style={{ textAlign: "center", marginTop: 50 }}>
@@ -228,7 +206,6 @@ export default function ReportPage() {
               cursor: "pointer",
               fontWeight: 800,
               boxShadow: "0 10px 30px rgba(74,110,245,0.55)",
-              transition: "0.25s",
             }}
           >
             💡 피드백 솔루션 제공받기
@@ -250,8 +227,8 @@ const td = {
   padding: 10,
   border: "1px solid #ddd",
   color: "#000",
-  wordBreak: "break-word",
-  whiteSpace: "normal",
+  overflowWrap: "anywhere" as const, // ✅ 타입 안전 + 줄바꿈
+  whiteSpace: "normal" as const,
 };
 
 function StatCard({ label, value, count, color }: any) {
@@ -264,7 +241,6 @@ function StatCard({ label, value, count, color }: any) {
         borderRadius: 12,
         textAlign: "center",
         minWidth: 120,
-        color: "#000",
       }}
     >
       <div style={{ fontWeight: 600, marginBottom: 6 }}>{label}</div>

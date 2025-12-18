@@ -105,7 +105,7 @@ export default function ReportPage() {
         background: "#f7f7f7",
         padding: "40px 20px",
         boxSizing: "border-box",
-        colorScheme: "light", // 🔥 다크모드 개입 차단
+        colorScheme: "light",
       }}
     >
       <div
@@ -123,7 +123,6 @@ export default function ReportPage() {
           📄 AI 솔로몬 분쟁 분석 보고서
         </h1>
 
-        {/* 사건 요약 */}
         <h2 style={{ fontSize: 20, fontWeight: 600 }}>1. 사건 요약</h2>
         <div
           style={{
@@ -139,67 +138,82 @@ export default function ReportPage() {
           {summary}
         </div>
 
-        {/* 패널 분석 */}
         <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32 }}>
           2. AI 패널별 분석 결과
         </h2>
 
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: 12,
-            fontSize: 14,
-            color: "#000",
-          }}
-        >
-          <thead>
-            <tr style={{ background: "#eee" }}>
-              <th style={th}>AI</th>
-              <th style={th}>판단 방향</th>
-              <th style={th}>사유</th>
-            </tr>
-          </thead>
-          <tbody>
-            {panels.map((p, index) => (
-              <tr key={index}>
-                <td style={{ ...td, whiteSpace: 'nowrap' }}>
-                  {panelNameMap[p.style] ?? p.style}
-                </td>
-                <td
-                  style={{
-                    ...td,
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",      // ✅ 줄바꿈 방지
-                    textAlign: "center",       // (선택) 가독성 ↑
-                    color:
-                      p.side === "입장 1 우세"
-                        ? "#2b7cff"
-                        : p.side === "입장 2 우세"
-                        ? "#d9534f"
-                        : "#555",
-                  }}
-                >
-                  {p.side}
-                </td>
-                <td style={td}>{p.reason}</td>
+        <div style={{ width: "100%", overflowX: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              marginTop: 12,
+              fontSize: 14,
+              color: "#000",
+            }}
+          >
+            <thead>
+              <tr style={{ background: "#eee" }}>
+                <th style={th}>AI</th>
+                <th style={th}>판단 방향</th>
+                <th style={th}>사유</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {panels.map((p, index) => (
+                <tr key={index}>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>
+                    {panelNameMap[p.style] ?? p.style}
+                  </td>
+                  <td
+                    style={{
+                      ...td,
+                      fontWeight: 600,
+                      whiteSpace: "nowrap",
+                      textAlign: "center",
+                      color:
+                        p.side === "입장 1 우세"
+                          ? "#2b7cff"
+                          : p.side === "입장 2 우세"
+                          ? "#d9534f"
+                          : "#555",
+                    }}
+                  >
+                    {p.side}
+                  </td>
+                  <td style={td}>{p.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        {/* 종합 판단 비율 */}
         <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32 }}>
           3. 종합 판단 비율
         </h2>
 
-        <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
-          <StatCard label="입장 1 우세" value={percent(countPos1)} count={countPos1} color="#2b7cff" />
-          <StatCard label="중립" value={percent(countNeutral)} count={countNeutral} color="#555" />
-          <StatCard label="입장 2 우세" value={percent(countPos2)} count={countPos2} color="#d9534f" />
+        {/* ✅ 여기 flexWrap 한 줄만 추가됨 */}
+        <div style={{ display: "flex", gap: 20, marginTop: 12, flexWrap: "wrap" }}>
+          <StatCard
+            label="입장 1 우세"
+            value={percent(countPos1)}
+            count={countPos1}
+            color="#2b7cff"
+          />
+          <StatCard
+            label="중립"
+            value={percent(countNeutral)}
+            count={countNeutral}
+            color="#555"
+          />
+          <StatCard
+            label="입장 2 우세"
+            value={percent(countPos2)}
+            count={countPos2}
+            color="#d9534f"
+          />
         </div>
 
-        {/* 버튼 */}
         <div style={{ textAlign: "center", marginTop: 50 }}>
           <button
             onClick={() => router.push("/feedback")}
@@ -235,6 +249,8 @@ const td = {
   padding: 10,
   border: "1px solid #ddd",
   color: "#000",
+  wordBreak: "break-word",
+  whiteSpace: "normal",
 };
 
 function StatCard({ label, value, count, color }: any) {

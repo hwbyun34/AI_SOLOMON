@@ -24,14 +24,14 @@ export default function LandingPage() {
       style={{
         minHeight: "100vh",
         padding: "40px 20px",
-        background: "#f5f6f8", // 🔹 메인 배경만 연한 흰톤
+        background: "#f5f6f8",
       }}
     >
       <div
         style={{
           maxWidth: 1000,
           margin: "0 auto",
-          background: "#ffffff", // 🔹 카드 완전 흰색
+          background: "#ffffff",
           padding: 36,
           borderRadius: 18,
           boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
@@ -185,6 +185,33 @@ export default function LandingPage() {
         >
           사건 입력하러 가기 →
         </button>
+
+        {/* Footer */}
+        <div
+          style={{
+            marginTop: 32,
+            paddingTop: 16,
+            borderTop: "1px solid #e5e7eb",
+            fontSize: 12,
+            color: "#777",
+            display: "flex",
+            justifyContent: "center",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <span style={{ cursor: "pointer" }} onClick={() => router.push("/about")}>
+            About
+          </span>
+          <span>|</span>
+          <span style={{ cursor: "pointer" }} onClick={() => router.push("/terms")}>
+            이용약관
+          </span>
+          <span>|</span>
+          <span style={{ cursor: "pointer" }} onClick={() => router.push("/privacy")}>
+            개인정보처리방침
+          </span>
+        </div>
       </div>
     </div>
   );

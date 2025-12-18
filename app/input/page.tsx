@@ -13,7 +13,6 @@ export default function Home() {
       return;
     }
 
-    // 로딩/광고 페이지로 텍스트 전달
     localStorage.setItem("dispute_text", text);
     router.push("/loading");
   };
@@ -27,7 +26,6 @@ export default function Home() {
         boxSizing: "border-box",
       }}
     >
-      {/* 가운데 정렬된 컨테이너 */}
       <div
         style={{
           maxWidth: 800,
@@ -54,16 +52,22 @@ export default function Home() {
         </p>
 
         {/* 라벨 */}
-        <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 15,
-                      WebkitTextFillColor: "#000",
-         }}>
+        <div
+          style={{
+            marginBottom: 8,
+            fontWeight: 600,
+            fontSize: 15,
+            WebkitTextFillColor: "#000",
+          }}
+        >
           📝 분쟁 내용을 입력해주세요
         </div>
 
-        {/* 대형 입력 박스 */}
+        {/* 🔧 수정된 textarea (문제 해결 핵심) */}
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
+          spellCheck={false} // ✅ 빨간 맞춤법 밑줄 제거
           placeholder={`예시)\n- 남자친구 , 여자친구의 의견이 충돌하여 갈등을 빚고있는 상황\n- 상대방과 의견 충돌이 지속되어 조정이나 대응 문서가 필요한 상황\n- 금전·물품·계약 관련 문제로 서로의 입장이 크게 엇갈리는 상황\n- 의사소통이 원활하지 않아 오해가 쌓이고 갈등이 심화된 상황`}
           style={{
             width: "100%",
@@ -75,7 +79,12 @@ export default function Home() {
             fontSize: 14,
             lineHeight: 1.6,
             boxSizing: "border-box",
-            WebkitTextFillColor: "#000",
+
+            /* ✅ 여기부터가 핵심 수정 */
+            color: "#111",              // 글자색 명시
+            background: "#ffffff",      // 배경색 명시
+            caretColor: "#111",         // 커서 색 명시
+            WebkitTextFillColor: "#111" // 사파리/크롬 대비
           }}
         />
 
@@ -89,13 +98,12 @@ export default function Home() {
             lineHeight: 1.6,
             fontSize: 13,
             color: "#555",
-            
           }}
         >
           <strong style={{ fontWeight: 600 }}>✦ 작성 가이드</strong>
           <ul style={{ marginTop: 8, paddingLeft: 20 }}>
             <li>언제, 어디서, 누구와 발생한 일인지 설명해주세요.</li>
-            <li>A의 의견 B의 의견을 분리해서 설명하면 더 정확한 분석 결과를 얻을수 있습니다.</li>
+            <li>A의 의견 B의 의견을 분리해서 설명하면 더 정확한 분석 결과를 얻을 수 있습니다.</li>
             <li>복잡한 사건일수록 더 정확한 분석이 가능합니다.</li>
           </ul>
         </div>

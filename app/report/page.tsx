@@ -106,6 +106,7 @@ export default function ReportPage() {
         padding: "40px 20px",
         boxSizing: "border-box",
         colorScheme: "light",
+        overflowX: "hidden",
       }}
     >
       <div

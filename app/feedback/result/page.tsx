@@ -22,17 +22,31 @@ export default function FeedbackResultPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FeedbackSolution | null>(null);
+  const [kakaoReady, setKakaoReady] = useState(false);
 
   /* ===========================
      카카오 SDK 초기화
   =========================== */
   useEffect(() => {
+    const key = process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string | undefined;
+
     const interval = setInterval(() => {
       const Kakao = (window as any).Kakao;
-      if (Kakao && Kakao.Share && !Kakao.isInitialized()) {
-        Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
-        clearInterval(interval);
+
+      // SDK 아직 로드 전
+      if (!Kakao) return;
+
+      // 키가 비었으면 초기화 불가
+      if (!key) return;
+
+      // 초기화
+      if (!Kakao.isInitialized()) {
+        Kakao.init(key);
       }
+
+      // 여기까지 왔으면 준비 완료로 판단
+      setKakaoReady(true);
+      clearInterval(interval);
     }, 100);
 
     return () => clearInterval(interval);
@@ -79,7 +93,21 @@ export default function FeedbackResultPage() {
   =========================== */
   const shareKakao = () => {
     const Kakao = (window as any).Kakao;
-    if (!Kakao || !data) return;
+
+    if (!data) {
+      alert("공유할 데이터가 없습니다.");
+      return;
+    }
+
+    if (!Kakao || !kakaoReady) {
+      alert("카카오 SDK가 아직 로딩 중입니다. 1초 후 다시 눌러주세요.");
+      return;
+    }
+
+    if (!Kakao.Share || !Kakao.Share.sendDefault) {
+      alert("카카오 공유 모듈이 준비되지 않았습니다. 새로고침 후 다시 시도해주세요.");
+      return;
+    }
 
     Kakao.Share.sendDefault({
       objectType: "feed",

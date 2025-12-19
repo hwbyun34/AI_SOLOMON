@@ -10,11 +10,6 @@ type Panel = {
   reason: string;
 };
 
-type Positions = {
-  position1: string;
-  position2: string;
-};
-
 const panelNameMap: Record<string, string> = {
   "사실관계 정합성 분석 패널": "🗂️ 팩트봇",
   "증거 신뢰도 및 근거 충족성 평가 패널": "🔍 증거봇",
@@ -33,10 +28,6 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState("");
   const [panels, setPanels] = useState<Panel[]>([]);
-  const [positions, setPositions] = useState<Positions>({
-  position1: "",
-  position2: "",
-});
 
   const [kakaoReady, setKakaoReady] = useState(false);
 
@@ -111,10 +102,6 @@ export default function ReportPage() {
   function applyResult(data: any) {
     setSummary(data.summary);
     setPanels(data.panels);
-    if (data.positions)
-    {
-      setPositions(data.positions);
-    }
     setLoading(false);
   }
 
@@ -213,54 +200,7 @@ export default function ReportPage() {
         </div>
 
         <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32, color: "#000" }}>
-          2. 입장별 정리
-        </h2>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 20,
-            marginTop: 12,
-          }}
-        >
-          {/* 입장 1 */}
-          <div
-            style={{
-              background: "#f3f7ff",
-              borderRadius: 14,
-              padding: 20,
-              border: "1px solid #d6e2ff",
-            }}
-          >
-            <div style={{ fontWeight: 700, color: "#2b7cff", marginBottom: 8 }}>
-              🔵 입장 1 요약
-            </div>
-            <div style={{ lineHeight: 1.6, whiteSpace: "pre-wrap",color: "#000", }}>
-              {positions.position1 || "해당 없음"}
-            </div>
-          </div>
-
-          {/* 입장 2 */}
-          <div
-            style={{
-              background: "#fff3f3",
-              borderRadius: 14,
-              padding: 20,
-              border: "1px solid #ffd6d6",
-            }}
-          >
-            <div style={{ fontWeight: 700, color: "#d9534f", marginBottom: 8 }}>
-              🔴 입장 2 요약
-            </div>
-            <div style={{ lineHeight: 1.6, whiteSpace: "pre-wrap" ,color: "#000",}}>
-              {positions.position2 || "해당 없음"}
-            </div>
-          </div>
-        </div>
-
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32, color: "#000" }}>
-          3. AI 패널별 분석 결과
+          2. AI 패널별 분석 결과
         </h2>
 
         <table
@@ -307,7 +247,7 @@ export default function ReportPage() {
         </table>
 
         <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32, color: "#000" }}>
-          4. 종합 판단 비율
+          3. 종합 판단 비율
         </h2>
 
         <div

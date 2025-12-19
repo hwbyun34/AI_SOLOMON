@@ -67,6 +67,27 @@ export async function POST(req: Request) {
 - 감정 패널은 감정 관점만, 도덕 패널은 도덕 관점만 사용하십시오.
 - 출력은 반드시 JSON만 허용됩니다.
 - 코드블록, 설명 문장, 여분 텍스트 절대 금지.
+
+⚠️ 분쟁 판별 예외 규칙 (매우 중요)
+- 입력된 내용이 분쟁, 갈등, 책임 소재, 대립 관계가 아닌 경우
+  (예: 정보 질문, 일상 대화, 의미 없는 문장, 판단 대상이 없는 경우)
+- 아래 JSON을 그대로 출력하고, 다른 판단은 절대 수행하지 마십시오.
+
+{
+  "summary": "본 입력은 분쟁 상황으로 판단되지 않습니다.",
+  "panels": [
+    { "panel": "AI Panel #1", "style": "비분쟁 판별", "side": "중립", "reason": "분쟁 요소 없음" },
+    { "panel": "AI Panel #2", "style": "비분쟁 판별", "side": "중립", "reason": "판단 대상 부재" },
+    { "panel": "AI Panel #3", "style": "비분쟁 판별", "side": "중립", "reason": "갈등 구조 없음" },
+    { "panel": "AI Panel #4", "style": "비분쟁 판별", "side": "중립", "reason": "책임 비교 불가" },
+    { "panel": "AI Panel #5", "style": "비분쟁 판별", "side": "중립", "reason": "대립 관계 없음" },
+    { "panel": "AI Panel #6", "style": "비분쟁 판별", "side": "중립", "reason": "감정 충돌 없음" },
+    { "panel": "AI Panel #7", "style": "비분쟁 판별", "side": "중립", "reason": "도덕 판단 불필요" },
+    { "panel": "AI Panel #8", "style": "비분쟁 판별", "side": "중립", "reason": "상식적 판단 대상 아님" },
+    { "panel": "AI Panel #9", "style": "비분쟁 판별", "side": "중립", "reason": "갈등 점화 요소 없음" },
+    { "panel": "AI Panel #10", "style": "비분쟁 판별", "side": "중립", "reason": "종합 판단 불가" }
+  ]
+}
         `,
       },
       {

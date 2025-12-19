@@ -29,10 +29,17 @@ export default function ReportPage() {
   const [summary, setSummary] = useState("");
   const [panels, setPanels] = useState<Panel[]>([]);
 
-  // ✅ 추가: 카카오 SDK 준비 상태
   const [kakaoReady, setKakaoReady] = useState(false);
 
   useEffect(() => {
+    // 🔥 추가 1: 기존 분석 결과 캐시 확인
+    const cached = localStorage.getItem("analysis_result");
+    if (cached) {
+      const data = JSON.parse(cached);
+      applyResult(data);
+      return; // 🔥 API 호출 완전 차단
+    }
+
     const text = localStorage.getItem("dispute_text");
     if (!text) {
       alert("분쟁 내용이 없습니다.");
@@ -52,6 +59,9 @@ export default function ReportPage() {
     })
       .then((res) => res.json())
       .then((data) => {
+        // 🔥 추가 2: 최초 분석 결과 캐시 저장
+        localStorage.setItem("analysis_result", JSON.stringify(data));
+
         aiFinished = true;
         aiResult = data;
         if (Date.now() - start >= MIN_LOADING_TIME) {
@@ -69,7 +79,6 @@ export default function ReportPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // ✅ 추가: 카카오 SDK 초기화 여부 확인 (기존 구조 영향 없음)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -94,7 +103,6 @@ export default function ReportPage() {
     setLoading(false);
   }
 
-  // ✅ 추가: 카카오톡 공유 함수 (기존 기능과 완전 분리)
   const shareKakao = () => {
     const Kakao = (window as any).Kakao;
 
@@ -253,7 +261,6 @@ export default function ReportPage() {
           <StatCard label="입장 2 우세" value={percent(countPos2)} count={countPos2} color="#d9534f" />
         </div>
 
-        {/* ✅ 기존 버튼 유지 + 카카오 공유 버튼만 추가 */}
         <div
           style={{
             display: "flex",

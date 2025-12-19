@@ -28,28 +28,23 @@ export default function FeedbackResultPage() {
      카카오 SDK 초기화
   =========================== */
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string | undefined;
+    if (typeof window === "undefined") return;
 
-    const interval = setInterval(() => {
+    if ((window as any).Kakao) return;
+
+    const script = document.createElement("script");
+    script.src = "https://developers.kakao.com/sdk/js/kakao.min.js";
+    script.async = true;
+
+    script.onload = () => {
       const Kakao = (window as any).Kakao;
-
-      // SDK 아직 로드 전
-      if (!Kakao) return;
-
-      // 키가 비었으면 초기화 불가
-      if (!key) return;
-
-      // 초기화
-      if (!Kakao.isInitialized()) {
-        Kakao.init(key);
+      if (Kakao && !Kakao.isInitialized()) {
+        Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
+        console.log("✅ Kakao SDK 로드 & 초기화 완료");
       }
+    };
 
-      // 여기까지 왔으면 준비 완료로 판단
-      setKakaoReady(true);
-      clearInterval(interval);
-    }, 100);
-
-    return () => clearInterval(interval);
+    document.head.appendChild(script);
   }, []);
 
   /* ===========================

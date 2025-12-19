@@ -4,6 +4,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
+// ✅ Kakao init Provider 추가
+import KakaoProvider from "./providers";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,14 +30,14 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        {/* Google AdSense (기존 그대로 유지) */}
+        {/* Google AdSense (기존 유지) */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5086983825808143"
           crossOrigin="anonymous"
         ></script>
 
-        {/* ✅ Kakao JavaScript SDK (수정됨) */}
+        {/* ✅ Kakao JavaScript SDK (정식 CDN + 안정 전략) */}
         <Script
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
           strategy="beforeInteractive"
@@ -42,6 +45,9 @@ export default function RootLayout({
       </head>
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* ✅ 카카오 SDK 초기화 (한 번만, 확실하게) */}
+        <KakaoProvider />
+
         {children}
       </body>
     </html>

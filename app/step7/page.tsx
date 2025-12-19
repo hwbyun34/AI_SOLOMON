@@ -20,17 +20,6 @@ export default function Step7Page() {
   const [writerName, setWriterName] = useState("");
   const [otherName, setOtherName] = useState("");
 
-  /* ===========================
-     카카오 SDK 초기화
-  =========================== */
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.Kakao) {
-      if (!window.Kakao.isInitialized()) {
-        window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
-      }
-    }
-  }, []);
-
   useEffect(() => {
     const savedIncident = localStorage.getItem("incident_summary");
     if (savedIncident) setIncidentSummary(savedIncident);
@@ -97,9 +86,16 @@ ${toneMap.close}
   };
 
   const shareKakao = () => {
-    if (!window.Kakao) return;
+    if (typeof window === "undefined") return;
 
-    window.Kakao.Share.sendDefault({
+    const Kakao = window.Kakao;
+
+    if (!Kakao || !Kakao.isInitialized()) {
+      alert("카카오 공유를 준비 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
+    Kakao.Share.sendDefault({
       objectType: "feed",
       content: {
         title: "AI 솔로몬 · 분쟁 정리 및 재발방지 확인서",
@@ -228,7 +224,7 @@ ${toneMap.close}
         {/* 버튼 */}
         <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 32 }}>
           <button onClick={savePdf} style={btnDark}>PDF로 저장</button>
-          <button onClick={shareKakao} style={btnKakao}>카카오톡으로 전달</button>
+          <button onClick={shareKakao} style={btnKakao}>카카오톡으로 공유</button>
         </div>
       </div>
     </div>

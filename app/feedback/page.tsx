@@ -18,12 +18,12 @@ export default function LoadingPage() {
   ];
 
     messages.forEach((_, index) => {
-      setTimeout(() => setPhase(index), index * 4000); // 4초 × 5단계 = 총 20초
+      setTimeout(() => setPhase(index), index * 3000); // 3초 × 5단계 = 총 15초
     });
 
     const timer = setTimeout(() => {
       router.push("/feedback/result");
-    }, 20000); // 20초 후 리포트 페이지 이동
+    }, 15000); // 15초 후 리포트 페이지 이동
 
     return () => clearTimeout(timer);
   }, [router]);
@@ -116,7 +116,7 @@ export default function LoadingPage() {
         >
           <strong>🔸 광고 영역 (AdSense Auto Ads / Display Ad)</strong>
           <br />
-          아래에 Google 광고가 자동으로 삽입됩니다.
+          광고 대기중
 
           <div style={{ marginTop: 10 }}>
             <ins

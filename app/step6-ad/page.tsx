@@ -18,12 +18,12 @@ export default function Step6AdPage() {
     ];
 
     messages.forEach((_, index) => {
-      setTimeout(() => setPhase(index), index * 4000); // 4초 × 5단계
+      setTimeout(() => setPhase(index), index * 3000); // 3초 × 5단계
     });
 
     const timer = setTimeout(() => {
       router.push("/step7"); // ✅ 7단계 이동
-    }, 20000);
+    }, 15000);
 
     return () => clearTimeout(timer);
   }, [router]);
@@ -114,9 +114,9 @@ export default function Step6AdPage() {
             lineHeight: 1.6,
           }}
         >
-          <strong>🔸 광고 영역 (AdSense)</strong>
+          <strong>🔸 광고 영역 (AdSense Auto Ads / Display Ad)</strong>
           <br />
-          무료 서비스 제공을 위해 광고가 노출됩니다.
+          광고 대기중
 
           <div style={{ marginTop: 10 }}>
             <ins

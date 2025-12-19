@@ -129,7 +129,7 @@ export default function FeedbackResultPage() {
           WebkitTextFillColor: "#000",
         }}
       >
-        AI 솔로몬이 합의 솔루션을 정리하고 있습니다...
+        AI 솔로몬이 합의 솔루션을 작성하고 있습니다...
       </div>
     );
   }

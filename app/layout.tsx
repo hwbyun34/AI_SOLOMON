@@ -27,17 +27,17 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        {/* Google AdSense */}
+        {/* Google AdSense (기존 그대로 유지) */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5086983825808143"
           crossOrigin="anonymous"
         ></script>
 
-        {/* Kakao JavaScript SDK */}
+        {/* ✅ Kakao JavaScript SDK (수정됨) */}
         <Script
-          src="https://developers.kakao.com/sdk/js/kakao.min.js"
-          strategy="afterInteractive"
+          src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+          strategy="beforeInteractive"
         />
       </head>
 

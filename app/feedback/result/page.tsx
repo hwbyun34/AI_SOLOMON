@@ -27,12 +27,15 @@ export default function FeedbackResultPage() {
      카카오 SDK 초기화
   =========================== */
   useEffect(() => {
-    if (typeof window !== "undefined" && (window as any).Kakao) {
+    const interval = setInterval(() => {
       const Kakao = (window as any).Kakao;
-      if (!Kakao.isInitialized()) {
+      if (Kakao && Kakao.Share && !Kakao.isInitialized()) {
         Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
+        clearInterval(interval);
       }
-    }
+    }, 100);
+
+    return () => clearInterval(interval);
   }, []);
 
   /* ===========================
@@ -78,7 +81,7 @@ export default function FeedbackResultPage() {
     const Kakao = (window as any).Kakao;
     if (!Kakao || !data) return;
 
-    Kakao.Link.sendDefault({
+    Kakao.Share.sendDefault({
       objectType: "feed",
       content: {
         title: "AI 솔로몬 합의 솔루션 보고서",

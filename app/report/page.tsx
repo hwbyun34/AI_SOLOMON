@@ -33,12 +33,14 @@ export default function ReportPage() {
 
   useEffect(() => {
     // 🔥 추가 1: 기존 분석 결과 캐시 확인
-    const cached = localStorage.getItem("analysis_result");
-    if (cached) {
-      const data = JSON.parse(cached);
-      applyResult(data);
-      return; // 🔥 API 호출 완전 차단
-    }
+  const cached = localStorage.getItem("analysis_result");
+  const cachedText = localStorage.getItem("analysis_text");
+  const currentText = localStorage.getItem("dispute_text");
+
+  if (cached && cachedText && currentText && cachedText === currentText) {
+    applyResult(JSON.parse(cached));
+    return; // 🔥 같은 지문일 때만 재사용
+  }
 
     const text = localStorage.getItem("dispute_text");
     if (!text) {

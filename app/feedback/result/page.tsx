@@ -22,33 +22,9 @@ export default function FeedbackResultPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FeedbackSolution | null>(null);
-  const [kakaoReady, setKakaoReady] = useState(false);
 
   /* ===========================
-     카카오 SDK 초기화
-  =========================== */
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    if ((window as any).Kakao) return;
-
-    const script = document.createElement("script");
-    script.src = "https://developers.kakao.com/sdk/js/kakao.min.js";
-    script.async = true;
-
-    script.onload = () => {
-      const Kakao = (window as any).Kakao;
-      if (Kakao && !Kakao.isInitialized()) {
-        Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
-        console.log("✅ Kakao SDK 로드 & 초기화 완료");
-      }
-    };
-
-    document.head.appendChild(script);
-  }, []);
-
-  /* ===========================
-     솔루션 데이터 로딩
+     솔루션 데이터 로딩 (기존 그대로)
   =========================== */
   useEffect(() => {
     const text = localStorage.getItem("dispute_text");
@@ -76,7 +52,6 @@ export default function FeedbackResultPage() {
         setData(json);
         setLoading(false);
       } catch (e: any) {
-        console.error(e);
         setError(e.message || "솔루션 생성 중 오류가 발생했습니다.");
         setLoading(false);
       }
@@ -84,9 +59,11 @@ export default function FeedbackResultPage() {
   }, []);
 
   /* ===========================
-     카카오톡 공유
+     카카오톡 공유 (정답)
   =========================== */
   const shareKakao = () => {
+    if (typeof window === "undefined") return;
+
     const Kakao = (window as any).Kakao;
 
     if (!data) {
@@ -94,13 +71,8 @@ export default function FeedbackResultPage() {
       return;
     }
 
-    if (!Kakao || !kakaoReady) {
-      alert("카카오 SDK가 아직 로딩 중입니다. 1초 후 다시 눌러주세요.");
-      return;
-    }
-
-    if (!Kakao.Share || !Kakao.Share.sendDefault) {
-      alert("카카오 공유 모듈이 준비되지 않았습니다. 새로고침 후 다시 시도해주세요.");
+    if (!Kakao || !Kakao.isInitialized()) {
+      alert("카카오 공유를 준비 중입니다. 잠시 후 다시 시도해주세요.");
       return;
     }
 
@@ -111,16 +83,16 @@ export default function FeedbackResultPage() {
         description: data.solution.main_direction,
         imageUrl: "https://ai-solomon.vercel.app/og-image.png",
         link: {
-          webUrl: "https://ai-solomon.vercel.app",
-          mobileWebUrl: "https://ai-solomon.vercel.app",
+          webUrl: window.location.href,
+          mobileWebUrl: window.location.href,
         },
       },
       buttons: [
         {
           title: "보고서 확인하기",
           link: {
-            webUrl: "https://ai-solomon.vercel.app",
-            mobileWebUrl: "https://ai-solomon.vercel.app",
+            webUrl: window.location.href,
+            mobileWebUrl: window.location.href,
           },
         },
       ],
@@ -128,17 +100,17 @@ export default function FeedbackResultPage() {
   };
 
   /* ===========================
-     6단계 광고 페이지로 이동
+     6단계 이동 (기존 그대로)
   =========================== */
   const goToStep6Ad = () => {
     if (!data) return;
 
-    // 7단계에서 사용할 데이터 저장
     localStorage.setItem("incident_summary", data.joint_summary);
     localStorage.setItem("solution_direction", data.solution.main_direction);
 
     router.push("/step6-ad");
   };
+
 
   /* ===========================
      로딩 / 에러 처리

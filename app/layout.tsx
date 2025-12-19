@@ -27,24 +27,22 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        {/* ✅ Google AdSense */}
+        {/* Google AdSense */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5086983825808143"
           crossOrigin="anonymous"
         ></script>
-      </head>
 
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-
-        {/* ✅ Kakao JavaScript SDK (Next.js App Router 정식 방식) */}
+        {/* Kakao JavaScript SDK */}
         <Script
-          src="https://developers.kakao.com/sdk/js/kakao.js"
+          src="https://developers.kakao.com/sdk/js/kakao.min.js"
           strategy="afterInteractive"
         />
+      </head>
+
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {children}
       </body>
     </html>
   );

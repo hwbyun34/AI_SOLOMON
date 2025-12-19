@@ -30,7 +30,7 @@ export default function FeedbackResultPage() {
     if (typeof window !== "undefined" && (window as any).Kakao) {
       const Kakao = (window as any).Kakao;
       if (!Kakao.isInitialized()) {
-        Kakao.init("카카오_자바스크립트_키"); // 네 키
+        Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
       }
     }
   }, []);
@@ -78,7 +78,7 @@ export default function FeedbackResultPage() {
     const Kakao = (window as any).Kakao;
     if (!Kakao || !data) return;
 
-    Kakao.Share.sendDefault({
+    Kakao.Link.sendDefault({
       objectType: "feed",
       content: {
         title: "AI 솔로몬 합의 솔루션 보고서",

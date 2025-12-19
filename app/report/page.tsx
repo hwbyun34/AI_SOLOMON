@@ -14,7 +14,7 @@ const panelNameMap: Record<string, string> = {
   "사실관계 정합성 분석 패널": "🗂️ 팩트봇",
   "증거 신뢰도 및 근거 충족성 평가 패널": "🔍 증거봇",
   "논리 구조 일관성 검증 패널": "🧠 논리봇",
-  "분쟁 발생의 핵심 원인 제공 분석 패널": "🧩 원인봇",
+  "분쟁 발생의 핵​심 원인 제공 분석 패널": "🧩 원인봇",
   "제3자 관점 사실 판단 패널": "👀 시점봇",
   "감정 반응 및 심리 영향 분석 패널": "❤️ 감정봇",
   "사회적 책임 및 도덕 규범 관점 패널": "🪞 도덕봇",
@@ -28,6 +28,9 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState("");
   const [panels, setPanels] = useState<Panel[]>([]);
+
+  // ✅ 추가: 카카오 SDK 준비 상태
+  const [kakaoReady, setKakaoReady] = useState(false);
 
   useEffect(() => {
     const text = localStorage.getItem("dispute_text");
@@ -66,11 +69,62 @@ export default function ReportPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // ✅ 추가: 카카오 SDK 초기화 여부 확인 (기존 구조 영향 없음)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const interval = setInterval(() => {
+      const Kakao = (window as any).Kakao;
+      if (!Kakao) return;
+
+      if (!Kakao.isInitialized()) {
+        Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
+      }
+
+      setKakaoReady(true);
+      clearInterval(interval);
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
   function applyResult(data: any) {
     setSummary(data.summary);
     setPanels(data.panels);
     setLoading(false);
   }
+
+  // ✅ 추가: 카카오톡 공유 함수 (기존 기능과 완전 분리)
+  const shareKakao = () => {
+    const Kakao = (window as any).Kakao;
+
+    if (!kakaoReady || !Kakao?.Share) {
+      alert("카카오톡 공유 준비 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
+    Kakao.Share.sendDefault({
+      objectType: "feed",
+      content: {
+        title: "AI 솔로몬 · 분쟁 분석 보고서",
+        description: summary || "AI 패널 10명이 분석한 분쟁 보고서입니다.",
+        imageUrl: "https://ai-solomon.vercel.app/og-image.png",
+        link: {
+          webUrl: window.location.href,
+          mobileWebUrl: window.location.href,
+        },
+      },
+      buttons: [
+        {
+          title: "보고서 확인하기",
+          link: {
+            webUrl: window.location.href,
+            mobileWebUrl: window.location.href,
+          },
+        },
+      ],
+    });
+  };
 
   if (loading) {
     return (
@@ -116,12 +170,11 @@ export default function ReportPage() {
           boxSizing: "border-box",
         }}
       >
-        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 12 , color: "#000", }}>
+        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 12, color: "#000" }}>
           📄 AI 솔로몬 분쟁 분석 보고서
         </h1>
 
-        {/* 사건 요약 */}
-        <h2 style={{ fontSize: 20, fontWeight: 600 , color: "#000", }}>1. 사건 요약</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 600, color: "#000" }}>1. 사건 요약</h2>
         <div
           style={{
             background: "#fafafa",
@@ -136,8 +189,7 @@ export default function ReportPage() {
           {summary}
         </div>
 
-        {/* 패널 분석 */}
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32,color: "#000", }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32, color: "#000" }}>
           2. AI 패널별 분석 결과
         </h2>
 
@@ -184,12 +236,10 @@ export default function ReportPage() {
           </tbody>
         </table>
 
-        {/* 종합 판단 비율 */}
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32,color: "#000", }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginTop: 32, color: "#000" }}>
           3. 종합 판단 비율
         </h2>
 
-        {/* 🔥 여기만 Grid */}
         <div
           style={{
             display: "grid",
@@ -203,8 +253,16 @@ export default function ReportPage() {
           <StatCard label="입장 2 우세" value={percent(countPos2)} count={countPos2} color="#d9534f" />
         </div>
 
-        {/* 버튼 */}
-        <div style={{ textAlign: "center", marginTop: 50 }}>
+        {/* ✅ 기존 버튼 유지 + 카카오 공유 버튼만 추가 */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 20,
+            marginTop: 50,
+            flexWrap: "wrap",
+          }}
+        >
           <button
             onClick={() => router.push("/feedback")}
             style={{
@@ -220,6 +278,24 @@ export default function ReportPage() {
             }}
           >
             💡 피드백 솔루션 제공받기
+          </button>
+
+          <button
+            onClick={shareKakao}
+            style={{
+              background: "#FEE500",
+              color: "#000",
+              padding: "26px 40px",
+              borderRadius: 18,
+              border: "none",
+              fontSize: 22,
+              cursor: "pointer",
+              fontWeight: 800,
+              boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            📤 카카오톡으로 공유
           </button>
         </div>
       </div>

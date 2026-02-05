@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 // ✅ Kakao init Provider 추가
 import KakaoProvider from "./providers";
@@ -49,6 +50,7 @@ export default function RootLayout({
         <KakaoProvider />
 
         {children}
+        <Analytics />
       </body>
     </html>
   );
